@@ -1,16 +1,9 @@
 'use strict';
 
-// B6 — Clockify (workspace projects).
-// Endpoint: GET https://api.clockify.me/api/v1/workspaces/${CLOCKIFY_WORKSPACE}/projects
-// Auth: header X-Api-Key=${CLOCKIFY_KEY}.  Widget: stacked-bar => widget type 'bar' (stacked:true).
-// Trigger: gte 90 on `utilization` (Capacity Reallocation, admin, 72h, medium).
 const { MissingKeyError } = require('../../lib/AppError');
 
 const BASE = 'https://api.clockify.me/api/v1';
 
-// Derive billable/non-billable hours and a utilization % from project estimates.
-// Clockify projects carry an `estimate` ({estimate:'PT40H'}) and a `duration`. We
-// approximate logged hours and a billable split per project.
 function parseIsoHours(iso) {
   if (!iso || typeof iso !== 'string') return 0;
   const m = iso.match(/PT(?:(\d+)H)?(?:(\d+)M)?/);
@@ -60,8 +53,7 @@ module.exports = {
       const name = p.name || p.id || 'Project';
       const est = parseIsoHours((p.estimate && p.estimate.estimate) || p.duration);
       const logged = est > 0 ? est : 8;
-      // Respect an explicit billable share when the project carries one; otherwise
-      // infer from the billable flag.
+
       let billRatio = Number(p.billableRatio);
       if (!Number.isFinite(billRatio) || billRatio < 0 || billRatio > 1) {
         billRatio = p.billable === false ? 0.2 : 0.75;
@@ -88,7 +80,7 @@ module.exports = {
   },
 
   sample() {
-    // Heavily billable client work pushes overall utilization to ~92% => breaches gte 90.
+
     return this.normalize([
       { id: 'p1', name: 'Client Alpha', billable: true, billableRatio: 0.95, estimate: { estimate: 'PT120H' } },
       { id: 'p2', name: 'Client Bravo', billable: true, billableRatio: 0.93, estimate: { estimate: 'PT96H' } },

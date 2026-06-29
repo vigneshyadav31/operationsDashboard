@@ -1,11 +1,5 @@
 'use strict';
 
-// Unit tests for cache/cache.js (CONTRACTS §7). Uses the real SQLite-backed cache
-// (no network — fetchFn is a local function). Each test uses a unique key so runs
-// are independent and deterministic. Verifies:
-//   - fresh hit within TTL (fetchFn not called again)
-//   - stale-while-revalidate after TTL (stale returned immediately, bg refresh)
-//   - graceful fallback when fetchFn throws (returns stale or error, never throws)
 const { test } = require('node:test');
 const assert = require('node:assert');
 
@@ -15,8 +9,6 @@ function uniqueKey(label) {
   return `test:${label}:${process.pid}:${Date.now()}:${Math.random().toString(36).slice(2)}`;
 }
 
-// Spin the event loop a couple of ticks so background revalidation (scheduled via
-// Promise.resolve().then(...)) has a chance to complete.
 async function flush() {
   await new Promise((r) => setImmediate(r));
   await new Promise((r) => setImmediate(r));
@@ -44,7 +36,7 @@ test('fresh hit within TTL returns cached value without re-fetching', async () =
 
 test('stale-while-revalidate: after TTL returns stale then refreshes in background', async () => {
   const key = uniqueKey('swr');
-  // Seed a cached value, then use ttl 0 so it is immediately considered stale.
+
   cache.set(key, { v: 'old' }, 0, 'fresh');
 
   let calls = 0;
@@ -59,7 +51,6 @@ test('stale-while-revalidate: after TTL returns stale then refreshes in backgrou
 
   await flush();
 
-  // Background revalidation should have replaced the cached value.
   const peeked = cache.peek(key);
   assert.deepStrictEqual(peeked.value, { v: 'new' }, 'background refresh stored the new value');
   assert.strictEqual(calls, 1, 'background revalidation ran exactly once');
@@ -82,13 +73,12 @@ test('graceful fallback: fetchFn throws with stale present -> returns stale, nev
       throw new Error('upstream boom');
     });
   });
-  // With a cached value present, SWR returns the stale value immediately and the
-  // background refresh failure is swallowed.
+
   assert.strictEqual(res.status, 'stale');
   assert.deepStrictEqual(res.value, { v: 'cached' });
 
   await flush();
-  // Failed background refresh must NOT clobber the cached value.
+
   assert.deepStrictEqual(cache.peek(key).value, { v: 'cached' });
 });
 

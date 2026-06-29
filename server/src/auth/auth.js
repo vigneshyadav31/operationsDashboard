@@ -1,8 +1,5 @@
 'use strict';
 
-// Authentication primitives: bcrypt hashing, user creation, login verification,
-// and session lifecycle. Sessions are random 32-byte hex ids stored in the
-// sessions table with a 7-day expiry, set as an HttpOnly `sid` cookie.
 const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
 const { db, uuid, nowIso } = require('../db/db');
@@ -10,7 +7,7 @@ const { config } = require('../config/env');
 const { AppError } = require('../lib/AppError');
 
 const COOKIE_NAME = 'sid';
-const SESSION_TTL_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
+const SESSION_TTL_MS = 7 * 24 * 60 * 60 * 1000;
 const BCRYPT_ROUNDS = 10;
 const VALID_ROLES = new Set(['founder', 'analyst', 'admin']);
 
@@ -41,7 +38,6 @@ function getUserById(id) {
   return db.prepare('SELECT * FROM users WHERE id = ?').get(id);
 }
 
-// Create a user. Throws AppError(409) if email already taken.
 function createUser({ email, password, name, role }) {
   const normEmail = String(email || '').trim().toLowerCase();
   if (!normEmail || !password) {
@@ -58,7 +54,6 @@ function createUser({ email, password, name, role }) {
   return publicUser(getUserById(id));
 }
 
-// Verify credentials; returns the public user on success, null otherwise.
 function verifyLogin(email, password) {
   const row = getUserByEmail(email);
   if (!row) return null;
@@ -66,7 +61,6 @@ function verifyLogin(email, password) {
   return publicUser(row);
 }
 
-// Create a session for a user id; returns the session id (cookie value).
 function createSession(userId) {
   const sid = crypto.randomBytes(32).toString('hex');
   const createdAt = nowIso();
@@ -82,7 +76,6 @@ function destroySession(sid) {
   db.prepare('DELETE FROM sessions WHERE id = ?').run(sid);
 }
 
-// Resolve a session id to its public user, honoring expiry. Cleans up expired rows.
 function getUserBySession(sid) {
   if (!sid) return null;
   const session = db.prepare('SELECT * FROM sessions WHERE id = ?').get(sid);

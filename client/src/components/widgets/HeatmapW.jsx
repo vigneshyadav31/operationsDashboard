@@ -1,8 +1,6 @@
 import React from 'react';
 import { heatColor, fmtNum, EmptyState } from './_shared.jsx';
 
-// widgetData: { xLabels:[...], yLabels:[...], cells:[{x,y,value}] }
-// x and y index into xLabels / yLabels.
 export default function HeatmapW({ data }) {
   if (!data) return <EmptyState />;
   const xLabels = Array.isArray(data.xLabels) ? data.xLabels : [];
@@ -17,11 +15,9 @@ export default function HeatmapW({ data }) {
   const max = Math.max(...values);
   const span = max - min || 1;
 
-  // Map (x,y) -> value for quick lookup.
   const lookup = new Map();
   cells.forEach((c) => lookup.set(`${c.x},${c.y}`, c.value));
 
-  // grid columns: 1 (y label) + xLabels
   const gridTemplate = `minmax(48px, auto) repeat(${xLabels.length}, 1fr)`;
 
   return (
@@ -32,7 +28,7 @@ export default function HeatmapW({ data }) {
         role="table"
         aria-label="Heatmap"
       >
-        {/* header row */}
+        {}
         <div aria-hidden="true" />
         {xLabels.map((xl, xi) => (
           <div className="heatmap-axis-x" key={`xh-${xi}`} title={String(xl)}>

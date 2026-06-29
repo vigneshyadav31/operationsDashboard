@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from 'react';
 
-// Renders a relative ("3m ago") + absolute (full timestamp on hover/title) time.
-// Re-renders every 30s so the relative label stays accurate.
 function relative(iso) {
   if (!iso) return 'never';
   const then = new Date(iso).getTime();

@@ -1,9 +1,5 @@
 'use strict';
 
-// Scheduled refresh job (CONTRACTS §12 / §9). On the configured cron it force-
-// refreshes every adapter with refresh:true through the cache, then runs the
-// trigger engine to (re)populate the Action Queue. Also exposes runOnce() which
-// is invoked once on startup so the dashboard + queue are populated immediately.
 const cron = require('node-cron');
 const { getAdapters } = require('../config/sources');
 const cache = require('../cache/cache');
@@ -15,8 +11,6 @@ const { logger } = require('../lib/logger');
 let task = null;
 let running = false;
 
-// Force-refresh a single adapter's cache entry. On failure the cache keeps prior
-// data (or stores nothing) — getOrFetch never throws.
 async function refreshAdapter(adapter) {
   const ttl = Number.isFinite(adapter.ttlSeconds) ? adapter.ttlSeconds : 300;
   const fetchFn = () => {
@@ -27,7 +21,6 @@ async function refreshAdapter(adapter) {
   return status;
 }
 
-// Force-refresh all adapters flagged refresh:true. Returns the count refreshed.
 async function refreshAll() {
   const adapters = getAdapters().filter((a) => a && a.refresh);
   let n = 0;
@@ -42,7 +35,6 @@ async function refreshAll() {
   return n;
 }
 
-// One full pass: refresh caches, then evaluate triggers.
 async function runOnce() {
   if (running) {
     logger.info('refresh: a run is already in progress; skipping');
@@ -59,7 +51,6 @@ async function runOnce() {
   }
 }
 
-// Start the cron schedule. Idempotent.
 function startRefreshJob() {
   if (task) return task;
   const expr = config.refreshCron || '*/10 * * * *';

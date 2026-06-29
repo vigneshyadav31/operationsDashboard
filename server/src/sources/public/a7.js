@@ -1,13 +1,7 @@
 'use strict';
 
-// A7 — RandomUser (HRIS seam / people directory placeholder).
-// Endpoint: GET https://randomuser.me/api/?results=24&nat=us,in,gb&seed=opsdash
-// Widget: avatar-grid. No trigger.
-
 const ENDPOINT = 'https://randomuser.me/api/?results=24&nat=us,in,gb&seed=opsdash';
 
-// Round-robin a small set of org roles across the directory so the grid reads
-// like a real headcount snapshot rather than undifferentiated people.
 const ROLES = [
   'Engineering',
   'Operations',
@@ -89,5 +83,4 @@ module.exports = {
     return this.normalize({ results });
   },
 
-  // No trigger for A7 (HRIS seam — descriptive widget only).
 };

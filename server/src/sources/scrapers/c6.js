@@ -1,10 +1,5 @@
 'use strict';
 
-// C6 — Wikimedia Pageviews (daily per-article views for Infosys) as an attention/
-// reputation proxy. A day with views well above the period mean (in std-devs) drives
-// the Reputation Audit SOP. Wikimedia policy requires a descriptive User-Agent with a
-// contact. Rendered as a line chart. Per CONTRACTS §2/§3.
-
 const { loadScraperConfig } = require('../../config/sources');
 
 const ID = 'C6';
@@ -17,7 +12,6 @@ function stats(values) {
   return { mean, sd };
 }
 
-// "yyyymmdd00" -> "yyyy-mm-dd"
 function fmtTs(ts) {
   const s = String(ts || '');
   if (s.length >= 8) return `${s.slice(0, 4)}-${s.slice(4, 6)}-${s.slice(6, 8)}`;
@@ -69,7 +63,7 @@ module.exports = {
     const values = points.map((p) => p.y);
     const { mean, sd } = stats(values);
     const peak = Math.max(...values);
-    // Peak distance from the period mean in std-devs (0 if flat).
+
     const viewsVsMean = sd > 0 ? Number(((peak - mean) / sd).toFixed(2)) : 0;
 
     return {
@@ -81,7 +75,7 @@ module.exports = {
   },
 
   sample() {
-    // 31 days with a clear spike (~day 20) so viewsVsMean > 2 and the trigger fires.
+
     const base = new Date(Date.UTC(2024, 0, 1));
     const baseline = [
       1200, 1180, 1240, 1320, 1290, 980, 1010, 1350, 1410, 1380,

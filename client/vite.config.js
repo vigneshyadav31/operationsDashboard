@@ -1,7 +1,6 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 
-// Vite dev server on 5173; proxy /api -> server on 4000.
 export default defineConfig({
   plugins: [react()],
   server: {

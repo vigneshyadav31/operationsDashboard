@@ -1,8 +1,5 @@
 'use strict';
 
-// Source-adapter registry loader. Synchronously requires every *.js adapter under
-// sources/public, sources/keyed and sources/scrapers. Tolerant of empty/missing
-// subfolders so the server boots even before adapter agents add their files.
 const fs = require('fs');
 const path = require('path');
 const yaml = require('js-yaml');
@@ -11,7 +8,7 @@ const { logger } = require('../lib/logger');
 const SOURCES_DIR = path.resolve(__dirname, '..', 'sources');
 const SUBDIRS = ['public', 'keyed', 'scrapers'];
 
-let adapters = null; // lazily populated, then cached
+let adapters = null;
 let byId = null;
 
 function listJsFiles(dir) {
@@ -19,7 +16,7 @@ function listJsFiles(dir) {
   try {
     entries = fs.readdirSync(dir, { withFileTypes: true });
   } catch (_e) {
-    return []; // missing folder => no adapters
+    return [];
   }
   return entries
     .filter((e) => e.isFile() && e.name.endsWith('.js') && !e.name.endsWith('.test.js'))
@@ -34,7 +31,7 @@ function loadAll() {
     const dir = path.join(SOURCES_DIR, sub);
     for (const file of listJsFiles(dir)) {
       try {
-        // eslint-disable-next-line global-require, import/no-dynamic-require
+
         const mod = require(file);
         const adapter = mod && mod.default ? mod.default : mod;
         if (adapter && typeof adapter === 'object' && adapter.id) {
@@ -47,7 +44,7 @@ function loadAll() {
       }
     }
   }
-  // Stable order by id for deterministic widget layout.
+
   loaded.sort((a, b) => String(a.id).localeCompare(String(b.id), undefined, { numeric: true }));
   adapters = loaded;
   byId = new Map(loaded.map((a) => [String(a.id).toUpperCase(), a]));
@@ -65,8 +62,6 @@ function getAdapter(id) {
   return byId.get(String(id).toUpperCase());
 }
 
-// Reads sources/scrapers/config/<id-lower>.yaml and returns the parsed object.
-// Returns null if the file is missing or unreadable.
 function loadScraperConfig(id) {
   if (!id) return null;
   const file = path.join(SOURCES_DIR, 'scrapers', 'config', `${String(id).toLowerCase()}.yaml`);

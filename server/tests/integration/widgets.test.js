@@ -1,10 +1,5 @@
 'use strict';
 
-// Integration: GET /api/widgets (CONTRACTS §5, §10 RBAC).
-//   - authed founder -> array of WidgetPayload, all populated (sample fallback)
-//   - a `sensitive` widget (A1) is restricted for analyst: data:null, status:'restricted'
-//     but available to the founder.
-//   - unauthenticated -> 401
 process.env.NODE_ENV = process.env.NODE_ENV || 'test';
 
 const { test } = require('node:test');
@@ -42,7 +37,7 @@ test('GET /api/widgets (founder) -> array of populated WidgetPayloads', async ()
       ['fresh', 'stale', 'error', 'restricted'].includes(w.status),
       `valid status: ${w.status}`
     );
-    // Non-restricted widgets must carry data (sample() fallback guarantees this).
+
     if (w.status !== 'restricted') {
       assert.ok(w.data !== undefined, `widget ${w.id} has a data field`);
     }
@@ -62,7 +57,6 @@ test('sensitive widget A1 is available to founder', async () => {
 test('sensitive widget A1 is RESTRICTED for analyst (data:null, status restricted)', async () => {
   const cookie = await loginCookie('analyst@demo.local');
 
-  // Via single-widget endpoint.
   const one = await request(app).get('/api/widgets/A1').set('Cookie', cookie);
   assert.strictEqual(one.status, 200);
   assert.strictEqual(one.body.id, 'A1');
@@ -70,7 +64,6 @@ test('sensitive widget A1 is RESTRICTED for analyst (data:null, status restricte
   assert.strictEqual(one.body.data, null);
   assert.strictEqual(one.body.metrics, null);
 
-  // And in the full list.
   const list = await request(app).get('/api/widgets').set('Cookie', cookie);
   assert.strictEqual(list.status, 200);
   const a1 = list.body.find((w) => w.id === 'A1');

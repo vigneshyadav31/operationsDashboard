@@ -1,11 +1,5 @@
 'use strict';
 
-// A2 — Frankfurter FX rates (USD -> EUR, GBP, INR) with a 30-day history.
-// Endpoints:
-//   latest : GET https://api.frankfurter.dev/v1/latest?from=USD&to=EUR,GBP,INR
-//   series : GET https://api.frankfurter.dev/v1/{start}..{end}?from=USD&to=EUR,GBP,INR
-// Widget: multiline. Trigger: abs_gt 2 on wowPct (Cross-border Invoicing).
-
 const BASE = 'https://api.frankfurter.dev/v1';
 const SYMBOLS = ['EUR', 'GBP', 'INR'];
 
@@ -51,7 +45,6 @@ module.exports = {
       })),
     }));
 
-    // Week-over-week % change per currency, taken as the largest absolute move.
     const wow = {};
     for (const s of series) {
       const pts = s.points.filter((p) => p.y > 0);
@@ -82,7 +75,7 @@ module.exports = {
   },
 
   sample() {
-    // 14 daily points; INR drifts ~+2.6% over the last week -> abs_gt 2 fires.
+
     const rates = {};
     const eur0 = 0.92;
     const gbp0 = 0.79;
@@ -93,7 +86,7 @@ module.exports = {
       rates[d] = {
         EUR: Math.round((eur0 + Math.sin(k / 3) * 0.004) * 1e4) / 1e4,
         GBP: Math.round((gbp0 + Math.cos(k / 4) * 0.003) * 1e4) / 1e4,
-        // INR ramps up roughly linearly so WoW exceeds +2%.
+
         INR: Math.round((inr0 + k * 0.32) * 1e4) / 1e4,
       };
     }

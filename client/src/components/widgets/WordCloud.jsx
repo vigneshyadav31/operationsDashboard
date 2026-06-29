@@ -1,7 +1,6 @@
 import React from 'react';
 import { PALETTE, EmptyState } from './_shared.jsx';
 
-// widgetData: { words:[{text,weight}], rows?:[{...}] }
 export default function WordCloud({ data }) {
   const words = data && Array.isArray(data.words) ? data.words : [];
   if (words.length === 0) return <EmptyState message="No terms" />;
@@ -12,12 +11,11 @@ export default function WordCloud({ data }) {
   const span = max - min || 1;
 
   const size = (w) => {
-    const t = (Number(w) - min) / span; // 0..1
-    return 12 + t * 22; // 12px .. 34px
+    const t = (Number(w) - min) / span;
+    return 12 + t * 22;
   };
   const opacity = (w) => 0.55 + ((Number(w) - min) / span) * 0.45;
 
-  // Sort biggest first for visual hierarchy.
   const sorted = [...words].sort((a, b) => (Number(b.weight) || 0) - (Number(a.weight) || 0));
   const rows = data && Array.isArray(data.rows) ? data.rows : [];
 

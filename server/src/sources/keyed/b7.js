@@ -1,16 +1,11 @@
 'use strict';
 
-// B7 — Notion (database query).
-// Endpoint: POST https://api.notion.com/v1/databases/${NOTION_DB_ID}/query
-// Auth: header Authorization: Bearer ${NOTION_TOKEN}, Notion-Version: 2022-06-28.  Widget: kanban.
-// Trigger: gt 0 on `unreviewed6mo` (SOP Refresh, admin, 168h, medium).
 const { MissingKeyError } = require('../../lib/AppError');
 
 const BASE = 'https://api.notion.com/v1';
 const NOTION_VERSION = '2022-06-28';
 const SIX_MONTHS_MS = 1000 * 60 * 60 * 24 * 182;
 
-// Extract a plain-text title from a Notion page's properties (first title-type prop).
 function titleOf(page) {
   const props = (page && page.properties) || {};
   for (const key of Object.keys(props)) {
@@ -22,7 +17,6 @@ function titleOf(page) {
   return '(untitled)';
 }
 
-// Extract a status/select name to use as the kanban column. Falls back to 'Backlog'.
 function statusOf(page) {
   const props = (page && page.properties) || {};
   for (const key of Object.keys(props)) {
@@ -91,9 +85,9 @@ module.exports = {
   },
 
   sample() {
-    const old = '2024-09-01T10:00:00.000Z'; // > 6 months before 2026-06-29
+    const old = '2024-09-01T10:00:00.000Z';
     const recent = '2026-06-01T10:00:00.000Z';
-    // Two stale SOPs => unreviewed6mo=2 breaches gt 0 (SOP refresh).
+
     return this.normalize({
       results: [
         {

@@ -1,9 +1,5 @@
 'use strict';
 
-// B4 — FRED (CPIAUCSL — US CPI, all urban consumers).
-// Endpoint: GET https://api.stlouisfed.org/fred/series/observations?series_id=CPIAUCSL&api_key=${FRED_KEY}&file_type=json
-// Auth: query-string api_key.  Widget: line.
-// Trigger: gt 0.3 on `cpiMoM` (Pricing Review, analyst, 72h, medium).
 const { MissingKeyError } = require('../../lib/AppError');
 
 const BASE = 'https://api.stlouisfed.org/fred/series/observations';
@@ -33,7 +29,7 @@ module.exports = {
     const obs = (raw && Array.isArray(raw.observations) ? raw.observations : [])
       .filter((o) => o && o.value !== '.' && Number.isFinite(Number(o.value)))
       .map((o) => ({ date: o.date, value: Number(o.value) }))
-      // FRED can return desc; ensure ascending by date for the line chart.
+
       .sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0));
 
     const points = obs.map((o) => ({ x: o.date, y: o.value }));
@@ -52,7 +48,7 @@ module.exports = {
   },
 
   sample() {
-    // Last MoM jump ~0.55% breaches gt 0.3 (pricing review).
+
     return this.normalize({
       observations: [
         { date: '2026-01-01', value: '309.50' },

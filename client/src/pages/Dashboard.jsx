@@ -45,21 +45,19 @@ export default function Dashboard() {
     }
   }, []);
 
-  // Initial load + 60s polling.
   useEffect(() => {
     loadAll();
     const t = setInterval(() => loadAll({ silent: true }), POLL_MS);
     return () => clearInterval(t);
   }, [loadAll]);
 
-  // Founder/admin: re-run engine + refresh server-side, then reload.
   const handleRefreshAll = useCallback(async () => {
     setRefreshingAll(true);
     try {
       if (role === 'admin') {
         await api.refreshAll();
       } else {
-        // founder: refresh each non-restricted widget we can, then reload actions.
+
         const targets = widgets.filter((w) => w.status !== 'restricted');
         await Promise.allSettled(targets.map((w) => api.refreshWidget(w.id)));
       }
@@ -79,7 +77,7 @@ export default function Dashboard() {
         if (!mounted.current) return;
         setWidgets((prev) => prev.map((w) => (w.id === id ? updated : w)));
         setLastUpdated(new Date().toISOString());
-        // A refresh may have created/cleared actions.
+
         api.getActions().then((a) => mounted.current && setActions(Array.isArray(a) ? a : [])).catch(() => {});
       } catch (err) {
         if (mounted.current) setError(err.message || 'Widget refresh failed.');

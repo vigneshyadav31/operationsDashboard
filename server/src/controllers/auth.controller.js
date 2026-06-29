@@ -1,6 +1,5 @@
 'use strict';
 
-// Auth controller: register, login, logout, me (CONTRACTS §5).
 const auth = require('../auth/auth');
 const { audit } = require('../db/db');
 const { AppError } = require('../lib/AppError');
@@ -9,7 +8,6 @@ function setSessionCookie(res, sid) {
   res.cookie(auth.COOKIE_NAME, sid, auth.cookieOptions());
 }
 
-// POST /api/auth/register -> 201 {user} + Set-Cookie
 function register(req, res, next) {
   try {
     const { email, password, name, role } = req.body || {};
@@ -23,7 +21,6 @@ function register(req, res, next) {
   }
 }
 
-// POST /api/auth/login -> 200 {user} + Set-Cookie (401 on bad creds)
 function login(req, res, next) {
   try {
     const { email, password } = req.body || {};
@@ -38,7 +35,6 @@ function login(req, res, next) {
   }
 }
 
-// POST /api/auth/logout -> 204, clears cookie
 function logout(req, res, next) {
   try {
     const sid = req.cookies ? req.cookies[auth.COOKIE_NAME] : undefined;
@@ -51,7 +47,6 @@ function logout(req, res, next) {
   }
 }
 
-// GET /api/auth/me -> 200 {user} | 401
 function me(req, res, next) {
   try {
     if (!req.user) return next(new AppError(401, 'Not authenticated', 'UNAUTHENTICATED'));

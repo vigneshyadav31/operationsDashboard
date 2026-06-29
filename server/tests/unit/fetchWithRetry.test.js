@@ -1,20 +1,11 @@
 'use strict';
 
-// Unit tests for lib/fetchWithRetry.http (CONTRACTS §8):
-//   - retries on 429 + 5xx with backoff, honoring Retry-After
-//   - fails FAST on other 4xx (404 — no retry)
-//   - returns parsed JSON on 200
-// No real network: global fetch is stubbed. Backoff is real but tiny because the
-// stub returns success/failure synchronously and we keep attempt counts low; we
-// also stub global setTimeout to fire immediately so backoff sleeps don't slow the
-// suite or make it nondeterministic.
 const { test, beforeEach, afterEach } = require('node:test');
 const assert = require('node:assert');
 
 const { http } = require('../../src/lib/fetchWithRetry');
 const { AppError } = require('../../src/lib/AppError');
 
-// Build a minimal Response-like object the helper understands.
 function makeRes({ status = 200, json, text, headers = {} }) {
   const lower = {};
   for (const k of Object.keys(headers)) lower[k.toLowerCase()] = String(headers[k]);
@@ -32,13 +23,9 @@ let realSetTimeout;
 beforeEach(() => {
   realFetch = global.fetch;
   realSetTimeout = global.setTimeout;
-  // Make backoff sleeps resolve immediately and deterministically. The helper's
-  // own AbortController timeout uses setTimeout too, but it never fires because we
-  // invoke the callback on the next microtask only when delay > 0 is requested for
-  // sleeping; to be safe we run the callback asynchronously with zero delay.
+
   global.setTimeout = (fn, _ms) => {
-    // Schedule on the microtask queue so abort timers never actually abort a
-    // resolved fetch, while backoff sleeps still resolve promptly.
+
     return realSetTimeout(fn, 0);
   };
 });

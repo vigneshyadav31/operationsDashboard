@@ -1,11 +1,5 @@
 'use strict';
 
-// Unit tests for triggers/engine.js (CONTRACTS §9):
-//   - comparator correctness (gt/lt/gte/lte/eq/abs_gt/abs_gte)
-//   - idempotency: evaluating the same breaching event twice -> exactly one Action
-//   - SLA dueAt = firedAt + slaHours*3600s
-// Engine writes to the real SQLite DB; A1's sample() deterministically breaches
-// (changePct -12.42, abs_gt 10) so no network is involved.
 const { test } = require('node:test');
 const assert = require('node:assert');
 
@@ -35,13 +29,11 @@ test('comparators implement the §9 semantics', () => {
   assert.strictEqual(comparators.eq(7, 7), true);
   assert.strictEqual(comparators.eq(7, 8), false);
 
-  // abs_gt: |v| > t
   assert.strictEqual(comparators.abs_gt(-12, 10), true);
   assert.strictEqual(comparators.abs_gt(12, 10), true);
   assert.strictEqual(comparators.abs_gt(-8, 10), false);
   assert.strictEqual(comparators.abs_gt(10, 10), false, 'abs_gt is strict >');
 
-  // abs_gte: |v| >= t
   assert.strictEqual(comparators.abs_gte(-10, 10), true);
   assert.strictEqual(comparators.abs_gte(10, 10), true);
   assert.strictEqual(comparators.abs_gte(-9, 10), false);
@@ -49,12 +41,9 @@ test('comparators implement the §9 semantics', () => {
 
 test("A1's sample() breaches and creates exactly one Action (idempotent)", async () => {
   const idemKey = `${a1.id}:${a1.trigger.sopId}:${utcDay()}`;
-  // Clean any pre-existing row for today's bucket so this test is self-contained.
+
   db.prepare('DELETE FROM actions WHERE idem_key = ?').run(idemKey);
-  // Seed the cache with A1's deterministic sample() (BTC -12.42%) so the engine
-  // evaluates controlled data, not live market data. CoinGecko is reachable in
-  // dev/CI and its real 24h change rarely exceeds 10%, which would make this test
-  // environment-dependent; the engine correctly prefers live data otherwise.
+
   cache.set(a1.id, a1.sample(), a1.ttlSeconds, 'fresh');
 
   const r1 = await evaluateOne(a1);
@@ -62,7 +51,6 @@ test("A1's sample() breaches and creates exactly one Action (idempotent)", async
   assert.strictEqual(r1.created, true, 'first evaluation creates the card');
   assert.strictEqual(r1.idemKey, idemKey);
 
-  // Second evaluation of the SAME event/day must NOT create a second card.
   const r2 = await evaluateOne(a1);
   assert.strictEqual(r2.fired, true);
   assert.strictEqual(r2.created, false, 'idempotent: no duplicate card for same UTC day');
@@ -101,13 +89,12 @@ test('evaluateAll returns a summary and populates the queue from sample data', a
   assert.ok(summary.evaluated >= 1, 'there is at least one triggered adapter');
   assert.ok(summary.fired >= 1, 'at least one breach fires from sample data (A1)');
 
-  // The Action Queue must be non-empty after evaluating sample data.
   const total = db.prepare('SELECT COUNT(*) AS n FROM actions').get().n;
   assert.ok(total >= 1, 'engine produced Action Queue cards from sample data');
 });
 
 test('non-breaching metric does not create an Action', async () => {
-  // Synthetic adapter whose sample never breaches.
+
   const calm = {
     id: 'ZZTEST',
     trigger: {

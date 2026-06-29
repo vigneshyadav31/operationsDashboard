@@ -1,5 +1,3 @@
-# C6 — Wikimedia Pageviews (per-article daily views for Infosys)
-# Wikimedia REST API policy: descriptive User-Agent with a contact is required.
 id: C6
 enabled: true
 userAgent: "Operations Dashboard (Founder's Office) contact: ops-dashboard@example.com"

@@ -18,7 +18,6 @@ function formatCountdown(ms) {
   return { str, overdue };
 }
 
-// Live SLA countdown that ticks every second.
 function Sla({ action, now }) {
   if (action.status === 'done') {
     const met = action.metSla;
@@ -31,7 +30,7 @@ function Sla({ action, now }) {
   const due = new Date(action.dueAt).getTime();
   const remaining = due - now;
   const { str, overdue } = formatCountdown(remaining);
-  // "warn" inside last 2 hours.
+
   const warn = !overdue && remaining < 2 * 3600 * 1000;
   const cls = overdue ? 'overdue' : warn ? 'warn' : '';
   return (
@@ -112,7 +111,6 @@ export default function ActionQueue({ actions, onAck, onResolve }) {
   const [now, setNow] = useState(Date.now());
   const [busyId, setBusyId] = useState(null);
 
-  // Tick once a second so every SLA countdown stays live.
   useEffect(() => {
     const t = setInterval(() => setNow(Date.now()), 1000);
     return () => clearInterval(t);
@@ -120,7 +118,6 @@ export default function ActionQueue({ actions, onAck, onResolve }) {
 
   const list = Array.isArray(actions) ? actions : [];
 
-  // Sort: open/ack before done; then overdue first; then by due time; then severity.
   const sorted = [...list].sort((a, b) => {
     const aDone = a.status === 'done' ? 1 : 0;
     const bDone = b.status === 'done' ? 1 : 0;

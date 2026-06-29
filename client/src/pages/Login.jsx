@@ -14,7 +14,7 @@ export default function Login() {
     setBusy(true);
     try {
       await login(email.trim(), password);
-      // AuthProvider sets user -> App swaps to Dashboard automatically.
+
     } catch (err) {
       setError(
         err.status === 401

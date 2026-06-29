@@ -1,8 +1,5 @@
 'use strict';
 
-// Integration: GET /api/health -> 200 { status:'ok', ... } (CONTRACTS §5).
-// Imports the exported express app WITHOUT listening (index.js guards listen under
-// NODE_ENV=test). supertest binds an ephemeral port internally.
 process.env.NODE_ENV = process.env.NODE_ENV || 'test';
 
 const { test } = require('node:test');

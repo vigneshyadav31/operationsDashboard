@@ -1,15 +1,9 @@
 'use strict';
 
-// A8 — Reddit r/Entrepreneur top posts (competitive / sentiment signal).
-// Endpoint: GET https://www.reddit.com/r/Entrepreneur/top.json?limit=25&t=day
-//   Reddit requires a descriptive User-Agent header.
-// Widget: wordcloud. Trigger: abs_gt 2 on complaintSpike (Competitive Intelligence).
-
 const ENDPOINT = 'https://www.reddit.com/r/Entrepreneur/top.json?limit=25&t=day';
 const USER_AGENT =
   'OperationsDashboard/1.0 (Founders Office competitive-intel; contact: ops@demo.local)';
 
-// Words that signal complaints / negative sentiment (drives complaintSpike).
 const COMPLAINT_WORDS = [
   'scam', 'fraud', 'refund', 'broken', 'fail', 'failed', 'failing', 'lawsuit',
   'angry', 'terrible', 'worst', 'avoid', 'warning', 'banned', 'shutdown',
@@ -24,7 +18,6 @@ const STOPWORDS = new Set([
   'get', 'got', 'have', 'has', 'had', 'they', 'them', 'their', 'he', 'she',
 ]);
 
-// Baseline daily complaint count; the trigger watches the deviation from it.
 const COMPLAINT_BASELINE = 3;
 
 function tokenize(text) {
@@ -99,8 +92,7 @@ module.exports = {
   },
 
   sample() {
-    // Several complaint-laden titles push complaintCount well above baseline (3),
-    // so complaintSpike > 2 and the medium card fires.
+
     const titles = [
       'My SaaS got hit with a refund scam — warning to other founders',
       'This vendor is a complete ripoff, avoid them',

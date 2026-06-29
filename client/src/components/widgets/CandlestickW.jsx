@@ -11,9 +11,6 @@ import {
 } from 'recharts';
 import { EmptyState, fmtNum } from './_shared.jsx';
 
-// widgetData: { candles:[{t,o,h,l,c}], news?:[{title}] }
-// Approximate candlesticks with recharts: a thin "wick" bar (low->high) and a thick
-// "body" bar (open<->close), each rendered via a floating bar [start,end] value.
 const UP = '#16a34a';
 const DOWN = '#dc2626';
 
@@ -56,7 +53,7 @@ export default function CandlestickW({ data }) {
     .filter(Boolean);
 
   if (rows.length === 0) {
-    // No candle data — still show news if present.
+
     return (
       <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
         <EmptyState message="No price data" />
@@ -90,13 +87,13 @@ export default function CandlestickW({ data }) {
               allowDecimals
             />
             <Tooltip content={<CandleTooltip />} />
-            {/* Wick: thin full-range bar */}
+            {}
             <Bar dataKey="wick" barSize={2} isAnimationActive={false}>
               {rows.map((r, i) => (
                 <Cell key={`w-${i}`} fill={r.up ? UP : DOWN} />
               ))}
             </Bar>
-            {/* Body: thick open-close bar */}
+            {}
             <Bar dataKey="body" barSize={10} isAnimationActive={false} radius={1}>
               {rows.map((r, i) => (
                 <Cell key={`b-${i}`} fill={r.up ? UP : DOWN} />

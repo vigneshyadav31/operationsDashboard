@@ -1,12 +1,11 @@
 import React from 'react';
 import { fmtNum, EmptyState } from './_shared.jsx';
 
-// widgetData: { value, min, max, unit, thresholds:[{at,color}], forecast?:[{t,v}] }
 function polar(cx, cy, r, angleDeg) {
   const a = (angleDeg * Math.PI) / 180;
   return [cx + r * Math.cos(a), cy + r * Math.sin(a)];
 }
-// Semicircle gauge: 180deg (left) -> 360/0deg (right). We use 180..360.
+
 function arcPath(cx, cy, r, startFrac, endFrac) {
   const a0 = 180 + startFrac * 180;
   const a1 = 180 + endFrac * 180;
@@ -32,14 +31,13 @@ export default function GaugeW({ data }) {
   const r = 96;
 
   const thresholds = Array.isArray(data.thresholds) ? data.thresholds : [];
-  // Determine current color from thresholds (highest `at` <= value), default accent.
+
   let color = '#2563eb';
   const sorted = [...thresholds].sort((a, b) => Number(a.at) - Number(b.at));
   for (const th of sorted) {
     if (value >= Number(th.at)) color = th.color || color;
   }
 
-  // Build colored background segments from thresholds (each from its frac to next).
   const segs = [];
   if (sorted.length > 0) {
     let prevFrac = 0;
@@ -70,7 +68,7 @@ export default function GaugeW({ data }) {
         role="img"
         aria-label={`Gauge: ${fmtNum(value)} ${data.unit || ''} of range ${min}–${max}`}
       >
-        {/* track segments */}
+        {}
         {segs.map((sg, i) => (
           <path
             key={i}
@@ -82,7 +80,7 @@ export default function GaugeW({ data }) {
             opacity="0.45"
           />
         ))}
-        {/* value arc */}
+        {}
         <path
           d={arcPath(cx, cy, r, 0, Math.max(0.001, frac))}
           fill="none"
@@ -90,7 +88,7 @@ export default function GaugeW({ data }) {
           strokeWidth="14"
           strokeLinecap="round"
         />
-        {/* needle */}
+        {}
         <line x1={cx} y1={cy} x2={nx} y2={ny} stroke="#14202e" strokeWidth="2.5" strokeLinecap="round" />
         <circle cx={cx} cy={cy} r="5" fill="#14202e" />
         <text x={cx - r} y={cy + 16} fontSize="9" fill="#8a98a8">

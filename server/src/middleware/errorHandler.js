@@ -1,11 +1,8 @@
 'use strict';
 
-// Central Express error handler. Maps AppError -> its status/code, everything
-// else -> 500. Always responds with JSON shape { error, code }.
 const { AppError } = require('../lib/AppError');
 const { logger } = require('../lib/logger');
 
-// eslint-disable-next-line no-unused-vars
 function errorHandler(err, req, res, next) {
   const isApp = err instanceof AppError;
   const status = isApp && Number.isFinite(err.status) ? err.status : 500;

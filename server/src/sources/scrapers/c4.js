@@ -1,15 +1,9 @@
 'use strict';
 
-// C4 — Wikipedia REST summary for a key counterparty (Infosys), rendered as kpi-strip
-// tiles. We detect a change in the leadership/description fingerprint vs. the last
-// cached snapshot to flag a possible leadership change (Re-introduction Call SOP).
-// Wikimedia policy requires a descriptive User-Agent with contact. Per CONTRACTS §2/§3.
-
 const { loadScraperConfig } = require('../../config/sources');
 
 const ID = 'C4';
 
-// Lightweight description "fingerprint" so a materially changed summary surfaces.
 function fingerprint(text) {
   if (!text) return 0;
   let h = 0;
@@ -20,7 +14,6 @@ function fingerprint(text) {
   return h;
 }
 
-// Heuristic: does the summary mention a leadership/CEO change cue?
 function leadershipCue(text) {
   return /(\bCEO\b|chief executive|chairman|managing director|appointed|stepped down|resign)/i.test(
     text || ''

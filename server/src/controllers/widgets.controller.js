@@ -1,11 +1,5 @@
 'use strict';
 
-// Widget controller. Builds WidgetPayload (CONTRACTS §5) for each source adapter,
-// resolving data through cache.getOrFetch(adapter.id, ttl, fetch->normalize) and
-// falling back to adapter.sample() (status 'stale') when the live fetch fails.
-//
-// RBAC: `sensitive` widgets are hidden from non founder/admin roles — those users
-// get { data:null, metrics:null, status:'restricted' }.
 const { getAdapters, getAdapter } = require('../config/sources');
 const cache = require('../cache/cache');
 const { buildCtx } = require('../lib/adapterContext');
@@ -33,11 +27,9 @@ function baseEnvelope(adapter) {
   };
 }
 
-// Build a full WidgetPayload for one adapter, honoring RBAC + force refresh.
 async function buildPayload(adapter, user, { force = false } = {}) {
   const env = baseEnvelope(adapter);
 
-  // RBAC gate for sensitive widgets.
   if (adapter.sensitive && !isPrivileged(user)) {
     return { ...env, data: null, metrics: null, status: 'restricted', lastUpdated: null };
   }
@@ -52,14 +44,13 @@ async function buildPayload(adapter, user, { force = false } = {}) {
   try {
     result = await cache.getOrFetch(adapter.id, ttl, fetchFn, { force });
   } catch (err) {
-    // cache.getOrFetch never throws, but guard anyway.
+
     logger.warn(`widget ${adapter.id} cache error: ${err.message}`);
     result = { value: null, lastUpdated: null, status: 'error' };
   }
 
   let { value, lastUpdated, status } = result;
 
-  // Fall back to sample() so the UI always renders. Mark as 'stale'.
   if (!value || status === 'error') {
     try {
       value = adapter.sample();
@@ -81,7 +72,6 @@ async function buildPayload(adapter, user, { force = false } = {}) {
   return { ...env, data, metrics, status, lastUpdated: lastUpdated || null };
 }
 
-// GET /api/widgets
 async function list(req, res, next) {
   try {
     const adapters = getAdapters();
@@ -92,7 +82,6 @@ async function list(req, res, next) {
   }
 }
 
-// GET /api/widgets/:id
 async function getOne(req, res, next) {
   try {
     const adapter = getAdapter(req.params.id);
@@ -104,7 +93,6 @@ async function getOne(req, res, next) {
   }
 }
 
-// POST /api/widgets/:id/refresh  (requireRole founder/admin enforced by route)
 async function refreshOne(req, res, next) {
   try {
     const adapter = getAdapter(req.params.id);

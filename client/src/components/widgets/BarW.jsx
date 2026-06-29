@@ -11,7 +11,6 @@ import {
 } from 'recharts';
 import { PALETTE, EmptyState } from './_shared.jsx';
 
-// widgetData: { categories:[...], series:[{name,values:[...]}], stacked?:bool }
 export default function BarW({ data }) {
   const categories = data && Array.isArray(data.categories) ? data.categories : [];
   const series = data && Array.isArray(data.series) ? data.series : [];

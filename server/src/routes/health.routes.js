@@ -10,13 +10,11 @@ const START_TIME = Date.now();
 
 let version = '1.0.0';
 try {
-  // eslint-disable-next-line global-require
+
   version = require('../../package.json').version || version;
 } catch (_e) {
-  /* keep default */
-}
+  }
 
-// GET /api/health -> { status:'ok', uptimeSec, version, checks:{db,cache,sourcesLoaded} }
 router.get('/', (_req, res) => {
   let dbOk = false;
   try {

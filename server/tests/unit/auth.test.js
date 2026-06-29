@@ -1,11 +1,5 @@
 'use strict';
 
-// Unit tests for auth/auth.js (CONTRACTS §10):
-//   - bcrypt hash != plaintext (and verifies)
-//   - verifyLogin true/false against seeded + created users
-//   - session create -> lookup -> destroy lifecycle
-// Uses the real DB (demo users seeded on boot). New users use unique emails so the
-// suite is repeatable.
 const { test } = require('node:test');
 const assert = require('node:assert');
 const bcrypt = require('bcryptjs');

@@ -1,7 +1,3 @@
-// API wrapper for The Operations Dashboard.
-// All requests include credentials so the HttpOnly `sid` session cookie is sent.
-// Server contract is under /api (see CONTRACTS.md §5).
-
 const BASE = '/api';
 
 async function request(path, { method = 'GET', body, headers } = {}) {
@@ -26,7 +22,6 @@ async function request(path, { method = 'GET', body, headers } = {}) {
     throw err;
   }
 
-  // 204 No Content (e.g. logout) — nothing to parse.
   if (res.status === 204) return null;
 
   let payload = null;
@@ -53,7 +48,6 @@ async function request(path, { method = 'GET', body, headers } = {}) {
   return payload;
 }
 
-// ---- Auth ----
 export const login = (email, password) =>
   request('/auth/login', { method: 'POST', body: { email, password } });
 
@@ -64,7 +58,6 @@ export const logout = () => request('/auth/logout', { method: 'POST' });
 
 export const me = () => request('/auth/me');
 
-// ---- Widgets ----
 export const getWidgets = () => request('/widgets');
 
 export const getWidget = (id) => request(`/widgets/${encodeURIComponent(id)}`);
@@ -72,7 +65,6 @@ export const getWidget = (id) => request(`/widgets/${encodeURIComponent(id)}`);
 export const refreshWidget = (id) =>
   request(`/widgets/${encodeURIComponent(id)}/refresh`, { method: 'POST' });
 
-// ---- Actions (the SOP queue) ----
 export const getActions = () => request('/actions');
 
 export const ackAction = (id) =>
@@ -81,12 +73,10 @@ export const ackAction = (id) =>
 export const resolveAction = (id) =>
   request(`/actions/${encodeURIComponent(id)}/resolve`, { method: 'POST' });
 
-// ---- Triggers / health ----
 export const getRules = () => request('/triggers/rules');
 
 export const getHealth = () => request('/health');
 
-// ---- Admin-wide refresh (engine + cache) ----
 export const refreshAll = () => request('/refresh', { method: 'POST' });
 
 export default {

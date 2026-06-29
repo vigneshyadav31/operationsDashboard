@@ -1,7 +1,5 @@
 'use strict';
 
-// Zod body-validation helper. Usage: router.post('/x', validate(schema), handler).
-// On success the parsed/typed value replaces req.body. On failure -> 400.
 const { AppError } = require('../lib/AppError');
 
 function validate(schema, source = 'body') {

@@ -15,7 +15,6 @@ import TimelineW from './widgets/TimelineW.jsx';
 import KanbanW from './widgets/KanbanW.jsx';
 import SankeyW from './widgets/SankeyW.jsx';
 
-// Map each canonical widget type (CONTRACTS §4) to its renderer.
 const REGISTRY = {
   kpi: Kpi,
   'kpi-sparkline': Sparkline,
@@ -35,7 +34,6 @@ const REGISTRY = {
   sankey: SankeyW,
 };
 
-// Generic fallback for unknown widget types: a table if rows exist, else raw JSON.
 function GenericFallback({ data, meta }) {
   if (data && Array.isArray(data.rows)) {
     return <TableW data={data} />;

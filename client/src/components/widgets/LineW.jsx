@@ -11,8 +11,6 @@ import {
 } from 'recharts';
 import { PALETTE, EmptyState } from './_shared.jsx';
 
-// widgetData: { series:[{name,points:[{x,y}]}], xLabel, yLabel }  (line + multiline)
-// Merge series into a single row set keyed by x so recharts can render multiple lines.
 export default function LineW({ data }) {
   const series = data && Array.isArray(data.series) ? data.series : [];
   const usable = series.filter((s) => Array.isArray(s.points) && s.points.length > 0);

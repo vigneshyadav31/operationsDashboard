@@ -7,7 +7,6 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // On mount, ask the server who we are. 401 => not logged in (expected).
   useEffect(() => {
     let alive = true;
     (async () => {

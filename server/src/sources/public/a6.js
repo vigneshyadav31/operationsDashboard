@@ -1,10 +1,5 @@
 'use strict';
 
-// A6 — Open-Meteo air quality (Hyderabad HQ).
-// Endpoint: GET https://air-quality-api.open-meteo.com/v1/air-quality
-//   ?latitude=17.385&longitude=78.4867&hourly=pm2_5,pm10,ozone,us_aqi
-// Widget: gauge. Trigger: gt 200 on aqi (WFH Advisory, analyst, 12h, high).
-
 const ENDPOINT =
   'https://air-quality-api.open-meteo.com/v1/air-quality?latitude=17.385&longitude=78.4867&hourly=pm2_5,pm10,ozone,us_aqi';
 
@@ -31,7 +26,6 @@ module.exports = {
     const times = hourly.time || [];
     const aqiArr = hourly.us_aqi || [];
 
-    // Pick the index nearest "now"; fall back to the last available reading.
     const now = Date.now();
     let idx = aqiArr.length - 1;
     let best = Infinity;
@@ -47,7 +41,7 @@ module.exports = {
     }
 
     const value = Math.round(Number(aqiArr[idx]) || 0);
-    // 12-hour forward forecast for the gauge.
+
     const forecast = [];
     for (let i = idx + 1; i < Math.min(idx + 13, aqiArr.length); i++) {
       if (aqiArr[i] != null) {
@@ -79,7 +73,7 @@ module.exports = {
   },
 
   sample() {
-    // AQI 247 (very unhealthy) -> gt 200 fires the high-severity WFH advisory.
+
     const times = [];
     const us_aqi = [];
     const pm2_5 = [];

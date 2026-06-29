@@ -6,19 +6,16 @@ const { requireAuth, requireRole } = require('../middleware/auth');
 const { getRules } = require('../triggers/rules');
 const { evaluateAll } = require('../triggers/engine');
 
-// Primary actions router (mounted at /api/actions).
 const router = express.Router();
 router.get('/', requireAuth, ctrl.list);
 router.post('/:id/ack', requireAuth, ctrl.ack);
 router.post('/:id/resolve', requireAuth, ctrl.resolve);
 
-// Triggers router (mounted at /api/triggers): exposes the derived rules table.
 const triggersRouter = express.Router();
 triggersRouter.get('/rules', requireAuth, (_req, res) => {
   res.json(getRules());
 });
 
-// Refresh router (mounted at /api/refresh): admin-only on-demand engine run.
 const refreshRouter = express.Router();
 refreshRouter.post('/', requireAuth, requireRole('admin'), async (_req, res, next) => {
   try {

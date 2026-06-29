@@ -1,15 +1,9 @@
 'use strict';
 
-// B9 — Trello (member boards).
-// Endpoint: GET https://api.trello.com/1/members/me/boards?key=${TRELLO_KEY}&token=${TRELLO_TOKEN}
-// Auth: query-string key + token.  Widget: bar.
-// Trigger: gt 3 on `blockedDays` (Escalate Blocked, admin, 48h, medium).
 const { MissingKeyError } = require('../../lib/AppError');
 
 const BASE = 'https://api.trello.com/1';
 
-// Derive a "days blocked" signal per board. Trello boards carry a
-// `dateLastActivity`; the longer since activity, the more likely a card is stuck.
 function blockedDaysOf(board) {
   const ts = Date.parse(board.dateLastActivity || '');
   if (Number.isFinite(ts)) {
@@ -63,7 +57,7 @@ module.exports = {
   sample() {
     const now = Date.now();
     const daysAgo = (n) => new Date(now - n * 24 * 60 * 60 * 1000).toISOString();
-    // One board idle 6 days => blockedDays=6 breaches gt 3 (escalate blocked).
+
     return this.normalize([
       { id: 'b1', name: 'Onboarding — Globex', dateLastActivity: daysAgo(6), closed: false },
       { id: 'b2', name: 'Delivery — Initech', dateLastActivity: daysAgo(1), closed: false },

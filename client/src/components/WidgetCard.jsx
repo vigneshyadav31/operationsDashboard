@@ -3,7 +3,6 @@ import WidgetRenderer from './WidgetRenderer.jsx';
 import LastUpdated from './LastUpdated.jsx';
 import { useAuth } from '../auth/AuthContext.jsx';
 
-// Error boundary so one bad widget never crashes the whole dashboard.
 class WidgetErrorBoundary extends React.Component {
   constructor(props) {
     super(props);
@@ -13,7 +12,7 @@ class WidgetErrorBoundary extends React.Component {
     return { error };
   }
   componentDidCatch(error, info) {
-    // eslint-disable-next-line no-console
+
     console.error('Widget render error:', error, info);
   }
   render() {

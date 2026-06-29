@@ -1,7 +1,3 @@
-# C5 — Yahoo Finance intraday chart (training-only / JS-rendered upstream)
-# The query1.finance.yahoo.com chart endpoint is unofficial, frequently rate-limited
-# or cookie/crumb-gated, and the public site is JS-rendered. We attempt it but RELY ON
-# sample() so the candlestick widget always renders with zero keys.
 id: C5
 enabled: true
 userAgent: "Operations Dashboard (Founder's Office) contact: ops-dashboard@example.com"

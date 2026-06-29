@@ -1,9 +1,5 @@
 'use strict';
 
-// Express application entrypoint. Wires middleware, mounts /api routes, serves the
-// built client in production, and starts the background refresh job. Guarded so
-// that `require`-ing this module in tests does NOT auto-listen — the listener only
-// starts when the file is run directly (and not under NODE_ENV=test).
 const path = require('path');
 const fs = require('fs');
 const express = require('express');
@@ -28,7 +24,6 @@ function buildApp() {
   const app = express();
   app.set('trust proxy', true);
 
-  // CORS — allow the configured origin(s) with credentials (cookies).
   const allowedOrigins = String(config.corsOrigin || 'http://localhost:5173')
     .split(',')
     .map((s) => s.trim())
@@ -36,7 +31,7 @@ function buildApp() {
   app.use(
     cors({
       origin(origin, cb) {
-        // Allow same-origin / non-browser (no Origin header) and whitelisted origins.
+
         if (!origin || allowedOrigins.includes(origin)) return cb(null, true);
         return cb(null, false);
       },
@@ -47,11 +42,9 @@ function buildApp() {
   app.use(cookieParser());
   app.use(express.json({ limit: '1mb' }));
 
-  // Gateway (rate limit + request-id/log guard) and user attachment.
   app.use(createGateway());
   app.use(attachUser);
 
-  // API routes.
   app.use('/api/auth', authRoutes);
   app.use('/api/widgets', widgetRoutes);
   app.use('/api/actions', actionRoutes);
@@ -59,12 +52,10 @@ function buildApp() {
   app.use('/api/refresh', refreshRouter);
   app.use('/api/health', healthRoutes);
 
-  // Unknown /api route -> 404 JSON.
   app.use('/api', (req, _res, next) => {
     next(new AppError(404, `No such endpoint: ${req.method} ${req.originalUrl}`, 'NOT_FOUND'));
   });
 
-  // In production, serve the built client + SPA fallback.
   if (config.isProduction) {
     const clientDist = path.resolve(__dirname, '..', '..', 'client', 'dist');
     if (fs.existsSync(clientDist)) {
@@ -78,17 +69,15 @@ function buildApp() {
     }
   }
 
-  // Central error handler (last).
   app.use(errorHandler);
   return app;
 }
 
 const app = buildApp();
 
-// Start side effects (cron + initial run + listen) only when run directly.
 function start() {
   startRefreshJob();
-  // Populate caches + the action queue on startup (non-blocking).
+
   runOnce().catch((err) => logger.error(`startup runOnce failed: ${err.message}`));
 
   const server = app.listen(config.port, () => {

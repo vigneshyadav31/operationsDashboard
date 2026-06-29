@@ -1,14 +1,8 @@
 'use strict';
 
-// Action queue controller (CONTRACTS §5).
-//   list    — founder/admin see all; analyst sees ONLY assignee=='analyst'
-//             (object-level / IDOR demonstration via assignee filter).
-//   ack     — records ackAt, status 'ack', audits.
-//   resolve — records resolvedAt, status 'done', metSla = resolvedAt<=dueAt, audits.
 const { db, nowIso, audit } = require('../db/db');
 const { AppError } = require('../lib/AppError');
 
-// Map a DB row to the API Action shape (CONTRACTS §5).
 function toAction(row) {
   if (!row) return null;
   const breached =
@@ -43,7 +37,6 @@ function getRow(id) {
   return db.prepare('SELECT * FROM actions WHERE id = ?').get(id);
 }
 
-// GET /api/actions
 function list(req, res, next) {
   try {
     const user = req.user;
@@ -51,7 +44,7 @@ function list(req, res, next) {
     if (user && (user.role === 'founder' || user.role === 'admin')) {
       rows = db.prepare('SELECT * FROM actions ORDER BY fired_at DESC').all();
     } else {
-      // analyst (and any non-privileged role) only sees its own queue.
+
       rows = db
         .prepare("SELECT * FROM actions WHERE assignee = 'analyst' ORDER BY fired_at DESC")
         .all();
@@ -62,17 +55,15 @@ function list(req, res, next) {
   }
 }
 
-// Enforce object-level access: analysts may only act on analyst-assigned actions.
 function assertCanAccess(user, row) {
   if (!row) throw new AppError(404, 'Action not found', 'NOT_FOUND');
   const privileged = user && (user.role === 'founder' || user.role === 'admin');
   if (!privileged && row.assignee !== 'analyst') {
-    // Do not leak existence — respond 404 for cross-tenant access (IDOR guard).
+
     throw new AppError(404, 'Action not found', 'NOT_FOUND');
   }
 }
 
-// POST /api/actions/:id/ack
 function ack(req, res, next) {
   try {
     const row = getRow(req.params.id);
@@ -88,7 +79,6 @@ function ack(req, res, next) {
   }
 }
 
-// POST /api/actions/:id/resolve
 function resolve(req, res, next) {
   try {
     const row = getRow(req.params.id);

@@ -1,16 +1,10 @@
 'use strict';
 
-// Loads environment variables from a local .env file (if present) and exposes a
-// single typed config object. The app is designed to run with ZERO keys, so all
-// provider keys are optional — adapters degrade to sample() when they're absent.
-
 const path = require('path');
 const dotenv = require('dotenv');
 
-// .env lives at the repo root (one level above /server). Loading is idempotent
-// and silently does nothing if the file is missing.
 dotenv.config({ path: path.resolve(__dirname, '..', '..', '..', '.env') });
-// Also allow a server-local .env as a convenience fallback.
+
 dotenv.config({ path: path.resolve(__dirname, '..', '..', '.env') });
 
 function str(name, fallback = '') {
@@ -27,7 +21,6 @@ const nodeEnv = str('NODE_ENV', 'development');
 const isProduction = nodeEnv === 'production';
 const isTest = nodeEnv === 'test';
 
-// All upstream provider keys from CONTRACTS §3. Blank by default.
 const keys = {
   ALPHAVANTAGE_KEY: str('ALPHAVANTAGE_KEY'),
   OPENWEATHER_KEY: str('OPENWEATHER_KEY'),

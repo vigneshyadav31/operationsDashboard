@@ -1,5 +1,3 @@
-# C2 — Hacker News "Who is hiring?" hiring-signal approximation (Algolia search API)
-# The Algolia HN Search API is public and rate-friendly; no key required.
 id: C2
 enabled: true
 userAgent: "Operations Dashboard (Founder's Office) contact: ops-dashboard@example.com"

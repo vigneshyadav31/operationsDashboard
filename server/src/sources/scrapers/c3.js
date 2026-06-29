@@ -1,10 +1,5 @@
 'use strict';
 
-// C3 — RemoteOK public jobs API. Quarterly remote-compensation benchmark rendered as
-// a bubble chart (x = posting recency index, y = midpoint salary, r = role frequency).
-// The FIRST element of the upstream array is a legal/attribution notice and is dropped.
-// No trigger (informational). Per CONTRACTS §2/§3.
-
 const { loadScraperConfig } = require('../../config/sources');
 
 const ID = 'C3';
@@ -46,7 +41,6 @@ module.exports = {
       timeoutMs: 10000,
     });
 
-    // Drop the leading legal-notice element.
     const list = Array.isArray(raw) ? raw.slice(1) : null;
     return list;
   },
@@ -63,7 +57,7 @@ module.exports = {
     const points = withSalary.map((job, i) => {
       const primaryTag = Array.isArray(job.tags) && job.tags.length ? job.tags[0] : (job.position || 'role');
       return {
-        x: i + 1, // recency index (feed is newest-first)
+        x: i + 1,
         y: midSalary(job),
         r: Math.min(40, 8 + (Array.isArray(job.tags) ? job.tags.length : 1) * 2),
         label: `${(job.company || 'Co').toString().slice(0, 24)} · ${String(primaryTag).slice(0, 18)}`,
@@ -105,5 +99,4 @@ module.exports = {
     };
   },
 
-  // No trigger — quarterly informational benchmark.
 };

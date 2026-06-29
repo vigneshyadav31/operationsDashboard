@@ -1,10 +1,5 @@
 'use strict';
 
-// A3 — World Bank: India CPI inflation (FP.CPI.TOTL.ZG), annual %.
-// Endpoint: GET https://api.worldbank.org/v2/country/IND/indicator/FP.CPI.TOTL.ZG?format=json
-// Widget: bar. Trigger: gt 2 on inflationSd (latest year's deviation from the
-// trailing mean, in standard deviations) — Pricing Review.
-
 const ENDPOINT =
   'https://api.worldbank.org/v2/country/IND/indicator/FP.CPI.TOTL.ZG?format=json&per_page=60';
 
@@ -34,7 +29,7 @@ module.exports = {
   },
 
   normalize(raw) {
-    // World Bank returns [meta, [ {date, value, ...}, ... ]].
+
     const rows = Array.isArray(raw) && Array.isArray(raw[1]) ? raw[1] : [];
     const points = rows
       .filter((r) => r && r.value != null)
@@ -66,8 +61,7 @@ module.exports = {
   },
 
   sample() {
-    // Stable ~5% baseline with a sharp latest-year spike to 9.8% -> deviation
-    // exceeds 2 standard deviations, firing the medium card.
+
     const base = [4.9, 5.1, 4.8, 5.0, 4.7, 5.2, 4.9, 5.0, 5.1];
     const series = base.map((v, i) => ({
       date: String(2015 + i),

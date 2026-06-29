@@ -1,5 +1,3 @@
-# C4 — Wikipedia REST summary for a key counterparty (Infosys)
-# Wikimedia REST API policy: send a descriptive User-Agent with a contact URL/email.
 id: C4
 enabled: true
 userAgent: "Operations Dashboard (Founder's Office) contact: ops-dashboard@example.com"

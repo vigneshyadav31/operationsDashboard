@@ -1,18 +1,3 @@
-# ──────────────────────────────────────────────────────────────────────────────
-# The Operations Dashboard — Docker Compose
-#
-# One service that builds the Dockerfile and serves the API + built client on
-# http://localhost:4000. Runs with ZERO API keys (every adapter falls back to
-# deterministic sample() data); supply keys by filling in .env.
-#
-#   docker compose up --build        # build image and start
-#   docker compose up -d             # start in the background
-#   docker compose down              # stop and remove the container
-#
-# The SQLite database (server/data/ops.sqlite) is persisted in a named volume,
-# so demo users, the cache, and the Action Queue survive restarts.
-# ──────────────────────────────────────────────────────────────────────────────
-
 services:
   dashboard:
     build:
@@ -22,15 +7,14 @@ services:
     container_name: operations-dashboard
     ports:
       - "4000:4000"
-    # Load all env vars (provider keys + config) from the root .env file.
-    # Missing/blank keys are fine — adapters degrade to sample() data.
+
     env_file:
       - .env
     environment:
       NODE_ENV: production
       PORT: "4000"
     volumes:
-      # Persist the SQLite database + WAL files across container restarts.
+
       - dashboard-data:/app/server/data
     restart: unless-stopped
     healthcheck:

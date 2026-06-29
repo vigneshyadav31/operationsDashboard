@@ -1,14 +1,7 @@
 'use strict';
 
-// A5 — WHO GHO: NCD mortality (probability of dying 30-70 from the 4 main NCDs).
-// Endpoint: GET https://ghoapi.azureedge.net/api/NCDMORT3070
-// Widget: heatmap (country x year). Trigger: gt 0 on worsenedQoQ — here interpreted
-// as "number of tracked countries whose latest value worsened vs the prior year".
-// (Compliance Audit, analyst, 168h, low.)
-
 const ENDPOINT = 'https://ghoapi.azureedge.net/api/NCDMORT3070';
 
-// Countries (SpatialDim ISO3) we track for the operations footprint.
 const COUNTRIES = ['IND', 'USA', 'GBR', 'DEU', 'SGP'];
 const COUNTRY_LABEL = {
   IND: 'India',
@@ -38,7 +31,7 @@ module.exports = {
 
   normalize(raw) {
     const all = (raw && Array.isArray(raw.value) && raw.value) || [];
-    // Keep "both sexes" (Dim1 === 'BTSX') for our tracked countries.
+
     const filtered = all.filter(
       (r) =>
         COUNTRIES.includes(r.SpatialDim) &&
@@ -47,7 +40,7 @@ module.exports = {
     );
 
     const yearsSet = new Set();
-    // Map country -> year -> value (last write wins).
+
     const byCountry = {};
     for (const r of filtered) {
       const year = String(r.TimeDim);
@@ -67,7 +60,7 @@ module.exports = {
         const v = byCountry[c][y];
         if (v != null) cells.push({ x: xi, y: yi, value: v });
       });
-      // Worsened = latest available value higher than the prior available year.
+
       const yrs = Object.keys(byCountry[c]).sort();
       if (yrs.length >= 2) {
         const last = byCountry[c][yrs[yrs.length - 1]];
@@ -88,7 +81,7 @@ module.exports = {
   },
 
   sample() {
-    // India + Germany worsen in the latest year -> worsenedQoQ = 2 -> gt 0 fires.
+
     const baseline = {
       IND: { 2017: 22.4, 2018: 22.0, 2019: 21.7, 2020: 22.9 },
       USA: { 2017: 14.6, 2018: 14.3, 2019: 14.1, 2020: 13.9 },

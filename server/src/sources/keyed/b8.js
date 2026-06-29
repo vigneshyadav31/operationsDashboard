@@ -1,15 +1,9 @@
 'use strict';
 
-// B8 — Airtable (Clients table).
-// Endpoint: GET https://api.airtable.com/v0/${AIRTABLE_BASE}/Clients
-// Auth: header Authorization: Bearer ${AIRTABLE_PAT}.  Widget: gauge.
-// Trigger: gt 7 on `onboardingDays` (Escalate Onboarding, founder, 48h, high).
 const { MissingKeyError } = require('../../lib/AppError');
 
 const BASE = 'https://api.airtable.com/v0';
 
-// Pull a numeric onboarding duration from a record. Prefer an explicit
-// "Onboarding Days" field; otherwise compute days since a "Start Date".
 function onboardingDaysOf(fields) {
   const f = fields || {};
   const explicit = Number(f['Onboarding Days'] ?? f.OnboardingDays ?? f.onboardingDays);
@@ -74,7 +68,7 @@ module.exports = {
   },
 
   sample() {
-    // Worst client at 12 days => onboardingDays=12 breaches gt 7 (escalate onboarding).
+
     return this.normalize({
       records: [
         { id: 'rec1', fields: { Name: 'Globex', 'Onboarding Days': 12 } },

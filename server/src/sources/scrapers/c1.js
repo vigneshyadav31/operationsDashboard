@@ -1,22 +1,13 @@
 'use strict';
 
-// C1 — SEC EDGAR company submissions (Apple Inc., CIK 0000320193).
-// Public JSON filing history. We surface the most recent filings as a timeline and
-// count recent 8-K (material event) filings to drive the Material Event Memo SOP.
-// SEC requires a descriptive User-Agent carrying name + contact email (cfg/env SEC_EDGAR_UA)
-// and <=10 req/sec. Per CONTRACTS §2/§3.
-
 const { loadScraperConfig } = require('../../config/sources');
 
 const ID = 'C1';
 
-// 8-K filings (and amendments) signal a material corporate event.
 function is8K(form) {
   return typeof form === 'string' && form.toUpperCase().startsWith('8-K');
 }
 
-// Resolve the User-Agent SEC requires: prefer the env override (name+email), then the
-// YAML cfg.userAgent, then a safe documented placeholder. Never empty.
 function resolveUserAgent(cfg, ctx) {
   const fromEnv = ctx && ctx.env && ctx.env.SEC_EDGAR_UA ? String(ctx.env.SEC_EDGAR_UA).trim() : '';
   if (fromEnv) return fromEnv;
@@ -40,7 +31,7 @@ module.exports = {
 
   async fetch(ctx) {
     const cfg = loadScraperConfig(ID) || {};
-    if (cfg.enabled === false) return null; // signal normalize() to fall back to sample()
+    if (cfg.enabled === false) return null;
 
     const endpoint = cfg.endpoint || 'https://data.sec.gov/submissions/CIK0000320193.json';
     const userAgent = resolveUserAgent(cfg, ctx);
@@ -72,7 +63,6 @@ module.exports = {
     const primaryDocs = r.primaryDocDescription || [];
     const accession = r.accessionNumber || [];
 
-    // Build a timeline of the most recent filings (newest first, capped to 12).
     const events = [];
     const limit = Math.min(forms.length, 60);
     for (let i = 0; i < limit; i++) {
@@ -86,7 +76,6 @@ module.exports = {
     events.sort((a, b) => String(b.date).localeCompare(String(a.date)));
     const top = events.slice(0, 12);
 
-    // Count 8-K filings in the most recent 90 days as "new" material events.
     const cutoff = new Date(Date.now() - 90 * 24 * 3600 * 1000)
       .toISOString()
       .slice(0, 10);
@@ -102,7 +91,7 @@ module.exports = {
   },
 
   sample() {
-    // Realistic fixture: several recent 8-K material events so the trigger fires (new8K>0).
+
     const today = new Date();
     const d = (daysAgo) =>
       new Date(today.getTime() - daysAgo * 24 * 3600 * 1000).toISOString().slice(0, 10);

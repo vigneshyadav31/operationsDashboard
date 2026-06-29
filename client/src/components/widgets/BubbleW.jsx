@@ -11,7 +11,6 @@ import {
 } from 'recharts';
 import { EmptyState } from './_shared.jsx';
 
-// widgetData: { points:[{x,y,r,label}], xLabel, yLabel }
 function BubbleTooltip({ active, payload }) {
   if (!active || !payload || !payload.length) return null;
   const p = payload[0].payload;

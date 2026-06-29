@@ -1,9 +1,6 @@
 import React from 'react';
 import { EmptyState } from './_shared.jsx';
 
-// widgetData: { columns:[{key,label}], rows:[{...}] }
-// Also used as the generic fallback renderer (see WidgetRenderer): when no columns are
-// provided we derive them from the union of row keys.
 function cell(v) {
   if (v === null || v === undefined) return '—';
   if (typeof v === 'object') return JSON.stringify(v);

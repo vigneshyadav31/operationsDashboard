@@ -1,10 +1,5 @@
 'use strict';
 
-// C2 — Hacker News "Who is hiring?" hiring-signal approximation via the Algolia HN
-// Search API. We find the latest "Ask HN: Who is hiring?" story and use its comment
-// volume as a proxy for hiring activity among peer/portfolio companies. Drives the
-// Org Design Refresh SOP. Public API, no key. Per CONTRACTS §2/§3.
-
 const { loadScraperConfig } = require('../../config/sources');
 
 const ID = 'C2';
@@ -48,7 +43,6 @@ module.exports = {
     const hits = raw && Array.isArray(raw.hits) ? raw.hits : null;
     if (!hits) return this.sample();
 
-    // Keep the canonical monthly "Ask HN: Who is hiring?" threads, newest first.
     const threads = hits
       .filter((h) => /who\s+is\s+hiring/i.test(h.title || ''))
       .map((h) => ({
@@ -64,7 +58,6 @@ module.exports = {
     const categories = threads.map((t) => t.date || t.title.slice(0, 10)).reverse();
     const values = threads.map((t) => t.comments).reverse();
 
-    // "clientHiring" = number of recent threads with meaningful hiring activity.
     const clientHiring = threads.filter((t) => t.comments > 0).length;
 
     return {

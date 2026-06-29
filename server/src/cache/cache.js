@@ -1,12 +1,5 @@
 'use strict';
 
-// SQLite-backed TTL cache with stale-while-revalidate (CONTRACTS §7).
-//   getOrFetch(key, ttlSeconds, fetchFn, {force}) -> {value, lastUpdated, status}
-//   peek(key) -> {value, lastUpdated, status} | null
-//   get(key)  -> {value, lastUpdated, status} | null
-//   set(key, value, ttlSeconds, status)
-// Never throws to the caller: on fetchFn failure returns last cached value as
-// 'stale', or {value:null, status:'error'} when nothing is cached.
 const { db, nowIso } = require('../db/db');
 const { logger } = require('../lib/logger');
 
@@ -21,7 +14,6 @@ const upsertStmt = db.prepare(`
     status = excluded.status
 `);
 
-// Track in-flight background revalidations so we never stampede the same key.
 const inflight = new Set();
 
 function readRow(key) {
@@ -70,8 +62,6 @@ function peek(key) {
   return get(key);
 }
 
-// Run fetchFn, store the result fresh, and return it. On failure, do NOT store
-// (preserves any prior cached value) and rethrow so the caller can fall back.
 async function revalidate(key, ttlSeconds, fetchFn) {
   const value = await fetchFn();
   set(key, value, ttlSeconds, 'fresh');
@@ -82,15 +72,12 @@ async function getOrFetch(key, ttlSeconds, fetchFn, opts = {}) {
   const force = !!opts.force;
   const row = readRow(key);
 
-  // Fresh hit (and not forced) — return immediately.
   if (!force && row && isFresh(row, ttlSeconds)) {
     return { value: row.value, lastUpdated: row.lastUpdated, status: 'fresh' };
   }
 
   const hasCached = row && row.value !== null && row.value !== undefined;
 
-  // Stale-while-revalidate: if we have stale data and we're not forcing, return
-  // it immediately and refresh in the background.
   if (!force && hasCached) {
     if (!inflight.has(key)) {
       inflight.add(key);
@@ -104,7 +91,6 @@ async function getOrFetch(key, ttlSeconds, fetchFn, opts = {}) {
     return { value: row.value, lastUpdated: row.lastUpdated, status: 'stale' };
   }
 
-  // Forced refresh, or no cached value: await fetchFn.
   try {
     const value = await revalidate(key, ttlSeconds, fetchFn);
     const fresh = readRow(key);

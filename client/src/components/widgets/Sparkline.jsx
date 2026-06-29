@@ -1,7 +1,6 @@
 import React from 'react';
 import { fmtNum, Delta, EmptyState } from './_shared.jsx';
 
-// widgetData: { value, unit, delta, series:[{t,v}] }
 export default function Sparkline({ data }) {
   if (!data) return <EmptyState />;
   const series = Array.isArray(data.series) ? data.series : [];

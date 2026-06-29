@@ -1,11 +1,5 @@
 'use strict';
 
-// C7 — India MCA (Ministry of Corporate Affairs) company master data. The MCA21 portal
-// is interactive / captcha-gated and must NOT be scraped; official bulk data is a CSV
-// download (data.gov.in). This adapter does NOT hit the portal — it returns sample()
-// table data with a note. A company status change drives the KYC/Compliance Refresh
-// SOP. Per CONTRACTS §2/§3.
-
 const { loadScraperConfig } = require('../../config/sources');
 
 const ID = 'C7';
@@ -24,11 +18,9 @@ module.exports = {
     description: 'Company master data (CSV-sourced); flags status changes',
   },
 
-  // Per CONTRACTS §3: download CSV, do NOT scrape the portal. The adapter returns
-  // sample() with a note; fetch() resolves to null so normalize() uses the fixture.
   async fetch(_ctx) {
     const cfg = loadScraperConfig(ID) || {};
-    // enabled flag is honored; in all cases this source is CSV/sample-driven.
+
     void cfg;
     return null;
   },

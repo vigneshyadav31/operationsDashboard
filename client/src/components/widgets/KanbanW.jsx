@@ -1,7 +1,6 @@
 import React from 'react';
 import { EmptyState } from './_shared.jsx';
 
-// widgetData: { columns:[{name,cards:[{title,meta}]}] }
 export default function KanbanW({ data }) {
   const columns = data && Array.isArray(data.columns) ? data.columns : [];
   if (columns.length === 0) return <EmptyState message="No board data" />;

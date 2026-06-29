@@ -1,9 +1,5 @@
 'use strict';
 
-// Auth middleware (CONTRACTS §10).
-//   attachUser    — reads the `sid` cookie, resolves the session, sets req.user
-//   requireAuth   — 401 when no req.user
-//   requireRole   — 403 when req.user.role not in the allowed roles
 const { COOKIE_NAME, getUserBySession } = require('../auth/auth');
 const { AppError } = require('../lib/AppError');
 

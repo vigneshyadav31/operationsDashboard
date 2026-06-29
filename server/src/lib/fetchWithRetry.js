@@ -1,24 +1,15 @@
 'use strict';
 
-// HTTP helper used by every adapter (passed in as ctx.http). Built on global fetch
-// (Node 22). Per CONTRACTS §8:
-//   - retry on 429 + 5xx with exponential backoff 1s/2s/4s (capped at 8s), max 4 attempts
-//   - honor the Retry-After header (seconds or HTTP-date)
-//   - AbortController timeout (default 10s)
-//   - fail FAST on other 4xx (no retry)
-//   - parse 'json' | 'text'
-//   - throw AppError(status, message) on final failure
 const { AppError } = require('./AppError');
 
 const MAX_ATTEMPTS = 4;
-const BACKOFF_MS = [1000, 2000, 4000]; // applied between attempts; capped at 8s
+const BACKOFF_MS = [1000, 2000, 4000];
 const BACKOFF_CAP_MS = 8000;
 
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-// Parse Retry-After: integer seconds or an HTTP-date. Returns ms (>=0) or null.
 function parseRetryAfter(headerValue) {
   if (!headerValue) return null;
   const asInt = Number(headerValue);
@@ -58,7 +49,7 @@ async function http(url, opts = {}) {
       });
     } catch (err) {
       clearTimeout(timer);
-      // Network error or timeout (AbortError) — retryable.
+
       const isAbort = err && (err.name === 'AbortError' || err.code === 'ABORT_ERR');
       lastError = new AppError(
         isAbort ? 504 : 502,
@@ -73,7 +64,6 @@ async function http(url, opts = {}) {
     }
     clearTimeout(timer);
 
-    // Retryable status codes: 429 + any 5xx.
     if (res.status === 429 || res.status >= 500) {
       lastError = new AppError(res.status, `Upstream ${res.status} from ${url}`, 'UPSTREAM_RETRYABLE');
       if (attempt < MAX_ATTEMPTS - 1) {
@@ -84,7 +74,6 @@ async function http(url, opts = {}) {
       throw lastError;
     }
 
-    // Other 4xx: fail fast, no retry.
     if (res.status >= 400) {
       let detail = '';
       try {
@@ -99,7 +88,6 @@ async function http(url, opts = {}) {
       );
     }
 
-    // Success — parse and return.
     try {
       if (parse === 'text') return await res.text();
       if (parse === 'none') return res;
@@ -109,7 +97,6 @@ async function http(url, opts = {}) {
     }
   }
 
-  // Should be unreachable, but guarantee a throw.
   throw lastError || new AppError(502, `Request to ${url} failed`, 'FETCH_FAILED');
 }
 

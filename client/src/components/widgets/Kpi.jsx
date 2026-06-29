@@ -1,7 +1,6 @@
 import React from 'react';
 import { fmtNum, Delta, EmptyState } from './_shared.jsx';
 
-// widgetData: { value, unit, delta, label }
 export default function Kpi({ data }) {
   if (!data || data.value === undefined || data.value === null) {
     return <EmptyState />;

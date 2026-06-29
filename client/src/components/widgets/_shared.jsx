@@ -1,7 +1,5 @@
 import React from 'react';
 
-// Shared helpers used across widget components.
-
 export const PALETTE = ['#2563eb', '#16a34a', '#d97706', '#9333ea', '#0891b2', '#db2777', '#65a30d'];
 
 export function fmtNum(v, digits = 2) {
@@ -40,18 +38,17 @@ export function EmptyState({ message = 'No data available' }) {
   );
 }
 
-// Color scale 0..1 -> green -> amber -> red, for heatmaps.
 export function heatColor(t) {
   const c = Math.max(0, Math.min(1, Number.isFinite(t) ? t : 0));
   if (c < 0.5) {
-    // green -> amber
+
     const k = c / 0.5;
     const r = Math.round(52 + (217 - 52) * k);
     const g = Math.round(211 + (119 - 211) * k);
     const b = Math.round(153 + (6 - 153) * k);
     return `rgb(${r},${g},${b})`;
   }
-  // amber -> red
+
   const k = (c - 0.5) / 0.5;
   const r = Math.round(217 + (220 - 217) * k);
   const g = Math.round(119 + (38 - 119) * k);

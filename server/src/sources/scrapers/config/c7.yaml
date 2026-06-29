@@ -1,7 +1,3 @@
-# C7 — India MCA (Ministry of Corporate Affairs) company master data
-# The MCA21 portal is interactive/captcha-gated and must NOT be scraped. Bulk company
-# master data is published as downloadable CSV datasets on data.gov.in. This adapter
-# does not hit the portal: it relies on sample() and documents the CSV-download path.
 id: C7
 enabled: true
 userAgent: "Operations Dashboard (Founder's Office) contact: ops-dashboard@example.com"

@@ -1,10 +1,5 @@
 'use strict';
 
-// C5 — Yahoo Finance intraday chart (AAPL). The upstream is unofficial / JS-rendered /
-// frequently crumb-gated, so this adapter ATTEMPTS the documented chart endpoint but
-// RELIES ON sample() candlestick data (training-only) so the Market Event Memo widget
-// always renders. Per CONTRACTS §2/§3.
-
 const { loadScraperConfig } = require('../../config/sources');
 
 const ID = 'C5';
@@ -39,8 +34,6 @@ module.exports = {
       (cfg.userAgent && String(cfg.userAgent)) ||
       "Operations Dashboard (Founder's Office) contact: ops-dashboard@example.com";
 
-    // Best-effort: the endpoint is unreliable. Any failure bubbles to the cache layer,
-    // which degrades to sample(); we also guard with a try so a null raw -> sample().
     try {
       const raw = await ctx.http(endpoint, {
         method: 'GET',
@@ -58,7 +51,7 @@ module.exports = {
           : {};
       return { ts, open: q.open, high: q.high, low: q.low, close: q.close };
     } catch (_e) {
-      // Documented training-only fallback.
+
       return null;
     }
   },
@@ -95,9 +88,9 @@ module.exports = {
   },
 
   sample() {
-    // Realistic intraday OHLC with a notable move so a reader can see the candlestick.
+
     const base = new Date();
-    base.setUTCHours(13, 30, 0, 0); // ~market open UTC
+    base.setUTCHours(13, 30, 0, 0);
     const series = [
       [191.2, 191.9, 190.8, 191.6],
       [191.6, 192.4, 191.3, 192.1],

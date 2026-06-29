@@ -1,14 +1,9 @@
 'use strict';
 
-// B3 — NewsAPI (US business top headlines).
-// Endpoint: GET https://newsapi.org/v2/top-headlines?country=us&category=business
-// Auth: header X-Api-Key=${NEWSAPI_KEY}.  Widget: table.
-// Trigger: gt 0 on `negativeMentions` (Crisis Comms, founder, 24h, high).
 const { MissingKeyError } = require('../../lib/AppError');
 
 const BASE = 'https://newsapi.org/v2/top-headlines';
 
-// Lightweight negative-sentiment lexicon for headline scanning.
 const NEGATIVE_WORDS = [
   'lawsuit', 'sue', 'sued', 'fraud', 'recall', 'breach', 'hack', 'layoff', 'layoffs',
   'fired', 'scandal', 'probe', 'investigation', 'fine', 'fined', 'plunge', 'plunges',
@@ -74,7 +69,7 @@ module.exports = {
   },
 
   sample() {
-    // Two negative headlines => negativeMentions=2 breaches gt 0 (crisis comms).
+
     return this.normalize({
       status: 'ok',
       totalResults: 5,

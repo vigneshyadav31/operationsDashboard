@@ -1,14 +1,9 @@
 'use strict';
 
-// B5 — USAJOBS (compliance roles, Washington DC).
-// Endpoint: GET https://data.usajobs.gov/api/Search?Keyword=compliance&LocationName=Washington,DC
-// Auth: headers Authorization-Key=${USAJOBS_KEY}, User-Agent=${USAJOBS_EMAIL}, Host=data.usajobs.gov.
-// Widget: bar.  Trigger: gt 0 on `newPostings` (Capture Management, analyst, 168h, low).
 const { MissingKeyError } = require('../../lib/AppError');
 
 const BASE = 'https://data.usajobs.gov/api/Search';
 
-// Group postings into agency-level counts for the bar chart.
 function tally(items) {
   const counts = new Map();
   for (const it of items) {
@@ -69,7 +64,7 @@ module.exports = {
   },
 
   sample() {
-    // 4 postings across agencies => newPostings=4 breaches gt 0 (capture management).
+
     return this.normalize({
       SearchResult: {
         SearchResultCount: 4,

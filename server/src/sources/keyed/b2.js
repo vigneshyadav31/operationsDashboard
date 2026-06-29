@@ -1,33 +1,27 @@
 'use strict';
 
-// B2 — OpenWeatherMap (current conditions, Hyderabad).
-// Endpoint: GET https://api.openweathermap.org/data/2.5/weather?lat=17.385&lon=78.4867&appid=${OPENWEATHER_KEY}&units=metric
-// Auth: query-string appid.  Widget: kpi-strip.
-// Trigger: gt 0 on `severe` (Business Continuity, analyst, 12h, high).
 const { MissingKeyError } = require('../../lib/AppError');
 
 const BASE = 'https://api.openweathermap.org/data/2.5/weather';
 const LAT = 17.385;
 const LON = 78.4867;
 
-// Weather condition group ids that warrant a business-continuity flag.
-// 2xx thunderstorm, 5xx heavy rain, 6xx snow, 7xx atmosphere (fog/dust/tornado), 9xx extreme/squall.
 function severeFromConditions(weatherArr, windMs) {
   let severe = 0;
   for (const w of weatherArr || []) {
     const id = Number(w.id);
     if (!Number.isFinite(id)) continue;
     if (id < 800) {
-      // thunderstorm, drizzle group is 3xx (mild), rain 5xx, snow 6xx, atmosphere 7xx
-      if (id >= 200 && id < 300) severe += 1; // thunderstorm
-      else if (id >= 502 && id < 600) severe += 1; // heavy/violent rain
-      else if (id >= 600 && id < 700) severe += 1; // snow
-      else if (id >= 700 && id < 800 && id !== 701 && id !== 721) severe += 1; // fog/dust/ash/tornado
+
+      if (id >= 200 && id < 300) severe += 1;
+      else if (id >= 502 && id < 600) severe += 1;
+      else if (id >= 600 && id < 700) severe += 1;
+      else if (id >= 700 && id < 800 && id !== 701 && id !== 721) severe += 1;
     } else if (id > 800 && id >= 900 && id < 906) {
-      severe += 1; // extreme group
+      severe += 1;
     }
   }
-  if (Number.isFinite(windMs) && windMs >= 17) severe += 1; // gale-force winds
+  if (Number.isFinite(windMs) && windMs >= 17) severe += 1;
   return severe;
 }
 
@@ -75,7 +69,7 @@ module.exports = {
   },
 
   sample() {
-    // Severe thunderstorm + gale wind => severe>0 breaches gt 0 (business continuity).
+
     return this.normalize({
       weather: [{ id: 212, main: 'Thunderstorm', description: 'heavy thunderstorm' }],
       main: { temp: 34.8, feels_like: 41.2, humidity: 88, pressure: 996 },

@@ -33,7 +33,6 @@ function Avatar({ person }) {
   );
 }
 
-// widgetData: { people:[{name,avatar,role,country}] }
 export default function AvatarGrid({ data }) {
   const people = data && Array.isArray(data.people) ? data.people : [];
   if (people.length === 0) return <EmptyState message="No people" />;

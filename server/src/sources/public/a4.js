@@ -1,17 +1,9 @@
 'use strict';
 
-// A4 — Hacker News front page (top stories).
-// Endpoints:
-//   GET https://hacker-news.firebaseio.com/v0/topstories.json
-//   GET https://hacker-news.firebaseio.com/v0/item/{id}.json   (top 20)
-// Widget: table. Trigger: eq 1 on clientOnFrontPage (Inbound Press Response).
-// We watch for our client/company names appearing on the front page.
-
 const TOP_URL = 'https://hacker-news.firebaseio.com/v0/topstories.json';
 const ITEM_URL = (id) => `https://hacker-news.firebaseio.com/v0/item/${id}.json`;
 const TOP_N = 20;
 
-// Names to watch for in front-page titles (case-insensitive substring match).
 const WATCHLIST = ['infosys', 'reliance', 'acme', 'tata', 'wipro'];
 
 function detectClient(title) {
@@ -80,7 +72,7 @@ module.exports = {
   },
 
   sample() {
-    // One story mentions a watchlisted client -> clientOnFrontPage = 1 -> eq 1 fires.
+
     const titles = [
       ['Show HN: A faster SQLite-backed cache', 412, 188, 'devperson'],
       ['Reliance announces new cloud platform for SMBs', 521, 264, 'newsbot'],

@@ -1,7 +1,6 @@
 import React from 'react';
 import { fmtNum, Delta, EmptyState } from './_shared.jsx';
 
-// widgetData: { items:[{label,value,unit,delta}] }
 export default function KpiStrip({ data }) {
   const items = data && Array.isArray(data.items) ? data.items : [];
   if (items.length === 0) return <EmptyState />;

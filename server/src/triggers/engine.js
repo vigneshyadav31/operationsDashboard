@@ -1,21 +1,11 @@
 'use strict';
 
-// Trigger engine (CONTRACTS §9). For each adapter that declares a trigger:
-//   1. obtain the normalized payload via cache.getOrFetch (fetch+normalize, with
-//      sample() fallback baked into the fetchFn so it never throws upward),
-//   2. read metrics[trigger.metric] and compare against threshold,
-//   3. on breach upsert an Action keyed by `${sourceId}:${sopId}:${UTC-day}` using
-//      INSERT OR IGNORE (idempotent — exactly one card per event per UTC day),
-//   4. write an audit row.
-// To guarantee a populated queue with zero keys, evaluation uses
-// (cache value || adapter.sample()) for the metrics.
 const { getAdapters } = require('../config/sources');
 const cache = require('../cache/cache');
 const { db, uuid, nowIso, audit } = require('../db/db');
 const { buildCtx } = require('../lib/adapterContext');
 const { logger } = require('../lib/logger');
 
-// Comparator map (CONTRACTS §9). Each returns a boolean breach decision.
 const comparators = {
   gt: (v, t) => v > t,
   lt: (v, t) => v < t,
@@ -27,7 +17,7 @@ const comparators = {
 };
 
 function utcDayBucket(date = new Date()) {
-  return date.toISOString().slice(0, 10); // YYYY-MM-DD (UTC)
+  return date.toISOString().slice(0, 10);
 }
 
 const insertActionStmt = db.prepare(`
@@ -42,9 +32,6 @@ const insertActionStmt = db.prepare(`
   )
 `);
 
-// Resolve normalized metrics for an adapter through the cache. The fetchFn falls
-// back to sample() so zero-key environments still produce data. Returns the
-// normalized payload object (with a .metrics field) or null.
 async function resolveMetricsPayload(adapter) {
   const ttl = Number.isFinite(adapter.ttlSeconds) ? adapter.ttlSeconds : 300;
   const fetchFn = async () => {
@@ -53,16 +40,16 @@ async function resolveMetricsPayload(adapter) {
       const raw = await adapter.fetch(ctx);
       const normalized = adapter.normalize(raw);
       if (normalized && normalized.metrics) return normalized;
-      // No usable metrics from live data — use sample so triggers still evaluate.
+
       return adapter.sample();
     } catch (err) {
-      // Surface to cache layer so it can return stale, but we still want sample().
+
       throw err;
     }
   };
 
   const { value } = await cache.getOrFetch(adapter.id, ttl, fetchFn);
-  // (cache value || adapter.sample()) — guarantee metrics even on error/null.
+
   let payload = value;
   if (!payload || !payload.metrics) {
     try {
@@ -127,11 +114,10 @@ async function evaluateOne(adapter) {
     });
     return { fired: true, created: true, idemKey };
   }
-  // Already existed for this UTC day (idempotent no-op).
+
   return { fired: true, created: false, idemKey };
 }
 
-// Evaluate every triggered adapter. Returns a summary { evaluated, fired, created }.
 async function evaluateAll() {
   const adapters = getAdapters().filter((a) => a && a.trigger);
   let fired = 0;

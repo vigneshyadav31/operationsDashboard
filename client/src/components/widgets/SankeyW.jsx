@@ -1,9 +1,6 @@
 import React from 'react';
 import { PALETTE, fmtNum, EmptyState } from './_shared.jsx';
 
-// widgetData: { nodes:[{name}], links:[{source,target,value}] }
-// Approximation: list each flow source -> target with a proportional bar.
-// `source`/`target` may be node indices or names.
 export default function SankeyW({ data }) {
   if (!data) return <EmptyState />;
   const nodes = Array.isArray(data.nodes) ? data.nodes : [];
@@ -12,7 +9,7 @@ export default function SankeyW({ data }) {
 
   const nameOf = (ref) => {
     if (typeof ref === 'number') return nodes[ref]?.name ?? `#${ref}`;
-    // allow name string directly
+
     return String(ref);
   };
 

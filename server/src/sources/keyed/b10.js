@@ -1,16 +1,9 @@
 'use strict';
 
-// B10 — AQICN / WAQI (Hyderabad air quality feed).
-// Endpoint: GET https://api.waqi.info/feed/hyderabad/?token=${AQICN_TOKEN}
-// Auth: query-string token.  Widget: heatmap.
-// Trigger: gt 150 on `aqi` (WFH Advisory, analyst, 12h, high).
 const { MissingKeyError } = require('../../lib/AppError');
 
 const BASE = 'https://api.waqi.info/feed/hyderabad';
 
-// Build a pollutant x time-of-day heatmap from the feed. WAQI gives a current AQI
-// plus per-pollutant indices (iaqi) and a forecast (data.forecast.daily). We lay
-// pollutants on the Y axis and forecast days (or hours) on the X axis.
 function buildHeatmap(data) {
   const iaqi = (data && data.iaqi) || {};
   const pollutants = ['pm25', 'pm10', 'o3', 'no2', 'so2', 'co'];
@@ -22,7 +15,7 @@ function buildHeatmap(data) {
       present.push(p);
     }
   }
-  // X axis: forecast days if available, else a single "now" column.
+
   const forecast = (data && data.forecast && data.forecast.daily && data.forecast.daily.pm25) || [];
   const xLabels = forecast.length
     ? forecast.slice(0, 7).map((d) => String(d.day || '').slice(5))
@@ -32,7 +25,7 @@ function buildHeatmap(data) {
   present.forEach((p, yi) => {
     const baseVal = Number(iaqi[p].v);
     xLabels.forEach((_x, xi) => {
-      // Use the forecast avg for pm25 when present, else scale the current value.
+
       let v = baseVal;
       if (p === 'pm25' && forecast[xi] && Number.isFinite(Number(forecast[xi].avg))) {
         v = Number(forecast[xi].avg);
@@ -80,7 +73,7 @@ module.exports = {
   },
 
   sample() {
-    // Current AQI 178 (>150) breaches gt 150 (WFH advisory).
+
     return this.normalize({
       status: 'ok',
       data: {

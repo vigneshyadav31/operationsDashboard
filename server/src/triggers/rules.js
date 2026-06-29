@@ -1,7 +1,5 @@
 'use strict';
 
-// Derived rules table: every adapter that declares a `trigger` becomes a Rule
-// (CONTRACTS §5 shape).
 const { getAdapters } = require('../config/sources');
 
 function getRules() {

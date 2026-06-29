@@ -1,10 +1,6 @@
-# C1 — SEC EDGAR company submissions (Apple Inc., CIK 0000320193)
-# SEC requires a descriptive User-Agent carrying a real name + contact email and a
-# request rate of no more than 10 requests/second. We stay well under that.
 id: C1
 enabled: true
-# Override at runtime with the SEC_EDGAR_UA env var (name + email). The placeholder
-# below keeps the app runnable with zero config while documenting the required shape.
+
 userAgent: "Operations Dashboard (Founder's Office) contact: ops-dashboard@example.com"
 robots: "SEC EDGAR fair-access policy: declare a real User-Agent with name+email, max 10 req/sec, no bulk scraping of the web UI — use the JSON data.sec.gov endpoints. See https://www.sec.gov/os/accessing-edgar-data"
 rateLimitPerSec: 5

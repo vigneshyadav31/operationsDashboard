@@ -1,17 +1,10 @@
 'use strict';
 
-// B1 — Alpha Vantage (RELIANCE.BSE global quote).
-// Endpoint: GET https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=RELIANCE.BSE&apikey=${ALPHAVANTAGE_KEY}
-// Auth: query-string apikey.  ttlSeconds=21600 (free tier is 25 requests/DAY — be frugal).
-// Widget: candlestick.  Trigger: abs_gt 5 on changePct (Investor Update, founder, 24h, high, sensitive).
 const { MissingKeyError } = require('../../lib/AppError');
 
 const SYMBOL = 'RELIANCE.BSE';
 const BASE = 'https://www.alphavantage.co/query';
 
-// Build a small intraday candle series around a close/open so the candlestick chart
-// has something to render. Alpha Vantage's GLOBAL_QUOTE is a single OHLC snapshot;
-// we synthesize a handful of session candles trending toward the close.
 function buildCandles(open, high, low, close) {
   const o = Number(open);
   const h = Number(high);
@@ -41,7 +34,7 @@ module.exports = {
   name: 'Alpha Vantage — RELIANCE.BSE',
   category: 'keyed',
   sensitive: true,
-  ttlSeconds: 21600, // 6h — free tier allows only 25 calls/day.
+  ttlSeconds: 21600,
   refresh: true,
   widget: {
     type: 'candlestick',
@@ -64,7 +57,7 @@ module.exports = {
     const low = Number(q['04. low']);
     const price = Number(q['05. price']);
     const prevClose = Number(q['08. previous close']);
-    // Alpha Vantage gives "10. change percent" like "1.2345%".
+
     let changePct = parseFloat(String(q['10. change percent'] || '').replace('%', ''));
     if (!Number.isFinite(changePct)) {
       changePct = Number.isFinite(price) && Number.isFinite(prevClose) && prevClose !== 0
@@ -87,7 +80,7 @@ module.exports = {
   },
 
   sample() {
-    // Breaches abs_gt 5 (change of -6.2%) so the Action Queue populates with zero keys.
+
     return this.normalize({
       'Global Quote': {
         '01. symbol': 'RELIANCE.BSE',

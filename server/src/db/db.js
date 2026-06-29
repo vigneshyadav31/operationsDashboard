@@ -1,7 +1,5 @@
 'use strict';
 
-// better-sqlite3 connection + schema bootstrap + demo-user seed.
-// DB file: server/data/ops.sqlite. The ./data directory is created if missing.
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
@@ -21,7 +19,6 @@ const db = new Database(DB_FILE);
 db.pragma('journal_mode = WAL');
 db.pragma('foreign_keys = ON');
 
-// ---- Schema (CONTRACTS §6) ----
 db.exec(`
   CREATE TABLE IF NOT EXISTS users (
     id TEXT PRIMARY KEY,
@@ -81,7 +78,6 @@ db.exec(`
   );
 `);
 
-// ---- Helpers ----
 function uuid() {
   return crypto.randomUUID();
 }
@@ -90,7 +86,6 @@ function nowIso() {
   return new Date().toISOString();
 }
 
-// Insert an audit row. Best-effort; never throws to the caller.
 function audit(actor, action, entity, detail) {
   try {
     db.prepare(
@@ -108,7 +103,6 @@ function audit(actor, action, entity, detail) {
   }
 }
 
-// ---- Seed demo users on first run (CONTRACTS §6) ----
 function seedUsers() {
   const count = db.prepare('SELECT COUNT(*) AS n FROM users').get().n;
   if (count > 0) return;

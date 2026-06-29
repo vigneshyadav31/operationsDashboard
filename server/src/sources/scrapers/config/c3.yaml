@@ -1,5 +1,3 @@
-# C3 — RemoteOK public jobs API (remote-comp benchmark)
-# The first element of the array is a legal/attribution notice and must be dropped.
 id: C3
 enabled: true
 userAgent: "Operations Dashboard (Founder's Office) contact: ops-dashboard@example.com"

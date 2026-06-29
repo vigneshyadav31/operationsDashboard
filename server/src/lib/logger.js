@@ -1,6 +1,5 @@
 'use strict';
 
-// Tiny leveled logger with ISO timestamps. Quiet during tests to keep output clean.
 const LEVELS = { error: 0, warn: 1, info: 2, debug: 3 };
 
 const envLevel = (process.env.LOG_LEVEL || (process.env.NODE_ENV === 'test' ? 'error' : 'info')).toLowerCase();
