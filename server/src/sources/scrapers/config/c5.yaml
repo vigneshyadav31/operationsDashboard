@@ -1,0 +1,11 @@
+# C5 — Yahoo Finance intraday chart (training-only / JS-rendered upstream)
+# The query1.finance.yahoo.com chart endpoint is unofficial, frequently rate-limited
+# or cookie/crumb-gated, and the public site is JS-rendered. We attempt it but RELY ON
+# sample() so the candlestick widget always renders with zero keys.
+id: C5
+enabled: true
+userAgent: "Operations Dashboard (Founder's Office) contact: ops-dashboard@example.com"
+robots: "Yahoo Finance has no official public market-data API; query1.finance.yahoo.com is unofficial and may rate-limit or require a crumb/cookie. Treat as best-effort, low rate, descriptive User-Agent. Do not scrape the JS-rendered web UI."
+rateLimitPerSec: 1
+endpoint: "https://query1.finance.yahoo.com/v8/finance/chart/AAPL?range=1d&interval=5m"
+notes: "Training-only / JS-rendered: the upstream is unofficial and unreliable. The adapter ATTEMPTS the documented chart endpoint but relies on sample() candlestick data with a note so the Market Event Memo widget is always populated."

@@ -1,0 +1,9 @@
+# C6 — Wikimedia Pageviews (per-article daily views for Infosys)
+# Wikimedia REST API policy: descriptive User-Agent with a contact is required.
+id: C6
+enabled: true
+userAgent: "Operations Dashboard (Founder's Office) contact: ops-dashboard@example.com"
+robots: "Wikimedia Pageviews REST API User-Agent policy: requests MUST include a descriptive User-Agent with contact info; honor published rate limits and cache results. See https://www.mediawiki.org/wiki/API:Etiquette and the analytics pageviews docs."
+rateLimitPerSec: 2
+endpoint: "https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article/en.wikipedia.org/all-access/user/Infosys/daily/20240101/20240131"
+notes: "Daily Wikipedia pageviews for a key counterparty as a reputation/attention proxy. A spike (views well above the period mean) drives the Reputation Audit SOP. Rendered as a line chart."

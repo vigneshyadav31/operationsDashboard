@@ -1,0 +1,9 @@
+# C4 — Wikipedia REST summary for a key counterparty (Infosys)
+# Wikimedia REST API policy: send a descriptive User-Agent with a contact URL/email.
+id: C4
+enabled: true
+userAgent: "Operations Dashboard (Founder's Office) contact: ops-dashboard@example.com"
+robots: "Wikimedia REST API User-Agent policy: requests MUST carry a descriptive User-Agent with a contact (email or URL). Respect rate limits (~200 req/s global, far below for us). See https://www.mediawiki.org/wiki/API:Etiquette"
+rateLimitPerSec: 2
+endpoint: "https://en.wikipedia.org/api/rest_v1/page/summary/Infosys"
+notes: "Pulls the encyclopedic summary of a key counterparty to detect leadership / description changes that warrant a Re-introduction Call. Rendered as kpi-strip tiles."

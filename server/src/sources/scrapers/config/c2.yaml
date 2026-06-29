@@ -1,0 +1,9 @@
+# C2 — Hacker News "Who is hiring?" hiring-signal approximation (Algolia search API)
+# The Algolia HN Search API is public and rate-friendly; no key required.
+id: C2
+enabled: true
+userAgent: "Operations Dashboard (Founder's Office) contact: ops-dashboard@example.com"
+robots: "HN Algolia Search API is public and intended for programmatic use; be polite (<= a few req/sec), set a descriptive User-Agent, no aggressive crawling. See https://hn.algolia.com/api"
+rateLimitPerSec: 2
+endpoint: "https://hn.algolia.com/api/v1/search?query=who%20is%20hiring&tags=story"
+notes: "Approximates the monthly 'Ask HN: Who is hiring?' thread to gauge hiring activity among portfolio/peer companies (Org Design Refresh SOP). Counts comment volume on the latest hiring thread as a hiring signal."

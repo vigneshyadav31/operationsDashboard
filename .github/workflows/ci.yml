@@ -1,0 +1,87 @@
+# ──────────────────────────────────────────────────────────────────────────────
+# The Operations Dashboard — Continuous Integration
+#
+# On every push and pull request:
+#   1) install workspaces (npm ci at the repo root, with npm cache)
+#   2) build the Vite client
+#   3) run the server test suite (node --test) — the job FAILS if any test fails
+#   4) build the Docker image to prove the container still builds
+# ──────────────────────────────────────────────────────────────────────────────
+name: CI
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+    branches: ["**"]
+
+# Cancel superseded runs on the same ref to save CI minutes.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-test:
+    name: Build & test (Node 22)
+    runs-on: ubuntu-latest
+
+    env:
+      NODE_ENV: test
+      # The app needs zero secrets to run; pin the demo password for determinism.
+      DEMO_PASSWORD: demo1234
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          # Cache the npm download cache, keyed on the root lockfile.
+          cache: "npm"
+
+      # Reproducible install of all workspaces (server + client). Falls back to a
+      # plain install if no lockfile has been committed yet.
+      - name: Install dependencies
+        run: |
+          if [ -f package-lock.json ]; then
+            npm ci
+          else
+            npm install
+          fi
+
+      - name: Build client
+        run: npm run build --workspace client
+
+      # Run the server tests with the built-in test runner. A non-zero exit here
+      # (any failing test) fails the whole job.
+      - name: Run server tests
+        run: node --test
+        working-directory: server
+
+  docker-build:
+    name: Docker image builds
+    runs-on: ubuntu-latest
+    needs: build-and-test
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build image (no push)
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Dockerfile
+          push: false
+          load: true
+          tags: operations-dashboard:ci
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

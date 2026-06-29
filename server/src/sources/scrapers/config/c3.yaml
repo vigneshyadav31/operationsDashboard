@@ -1,0 +1,9 @@
+# C3 — RemoteOK public jobs API (remote-comp benchmark)
+# The first element of the array is a legal/attribution notice and must be dropped.
+id: C3
+enabled: true
+userAgent: "Operations Dashboard (Founder's Office) contact: ops-dashboard@example.com"
+robots: "RemoteOK exposes a public /api JSON feed and asks for attribution (the leading legal notice element). Identify with a descriptive User-Agent and keep request volume low — quarterly benchmark only. See https://remoteok.com/api"
+rateLimitPerSec: 1
+endpoint: "https://remoteok.com/api"
+notes: "Quarterly remote-compensation benchmark. The first array element is a legal notice and is dropped before normalize(). No trigger — informational bubble chart of salary vs. role."
